@@ -1,0 +1,17 @@
+{
+  "name": "AFTER CLASS · 彼得的私人宇宙",
+  "short_name": "After Class",
+  "description": "把纽约的黄昏、未说完的话，和我们的故事收进一本私人校刊。",
+  "lang": "zh-CN",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#dfd9ca",
+  "theme_color": "#8e2633",
+  "icons": [
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}

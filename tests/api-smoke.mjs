@@ -1,0 +1,30 @@
+import assert from 'node:assert/strict';
+const base=process.env.TEST_BASE_URL||'http://127.0.0.1:4173';
+if(!/^http:\/\/(127\.0\.0\.1|localhost):\d+$/.test(base))throw new Error('Smoke test must target the local preview only');
+const headers={cookie:'__sites_local_auth=1'};
+const req=async(path,options={})=>{const r=await fetch(base+path,{...options,headers:{...headers,...options.headers}});return {status:r.status,body:await r.json()}};
+const post=r=>req('/api/records',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(r)});
+const record={kind:'message',title:'自动测试 · 传讯图片',content:'仅用于本地功能验证。',tags:['QA'],date:'2026-10-29',data:{files:[]}};
+const unauthorized=await fetch(base+'/api/records');assert.equal(unauthorized.status,401);
+await req('/api/bootstrap',{method:'POST'});const before=(await req('/api/records')).body.records.length;
+await req('/api/bootstrap',{method:'POST'});assert.equal((await req('/api/records')).body.records.length,before);
+const fd=new FormData();const bytes=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aC1kAAAAASUVORK5CYII=','base64');fd.append('file',new File([bytes],'qa-image.png',{type:'image/png'}));
+const upload=await req('/api/assets',{method:'POST',body:fd});assert.equal(upload.status,201);const file=upload.body.file;
+const binary=await fetch(base+file.url,{headers});assert.equal(binary.status,200);assert.deepEqual(Buffer.from(await binary.arrayBuffer()),bytes);
+assert.equal((await fetch(base+file.url)).status,401);
+const bad=new FormData();bad.append('file',new File(['alert(1)'],'bad.html',{type:'text/html'}));assert.equal((await req('/api/assets',{method:'POST',body:bad})).status,415);
+const made=await post({...record,data:{files:[file],cover:file.url}});assert.equal(made.status,201);let r=made.body.record;assert.equal(r.data.files[0].id,file.id);
+let change=await post({...r,favorite:true});assert.equal(change.status,200);assert.equal(change.body.record.favorite,true);assert.equal(change.body.record.revision,2);
+assert.equal((await post({...r,content:'stale'})).status,409);r=change.body.record;
+assert.equal((await post({...r,kind:'link',data:{url:'javascript:alert(1)'}})).status,400);
+assert.equal((await req('/api/records?id='+r.id,{method:'DELETE'})).status,404);
+change=await post({...r,deleted:true});assert.equal(change.status,200);assert.equal(change.body.record.deleted,true);r=change.body.record;
+change=await post({...r,deleted:false});assert.equal(change.status,200);assert.equal(change.body.record.deleted,false);r=change.body.record;
+r=(await post({...r,deleted:true})).body.record;
+assert.equal((await req('/api/records?id='+r.id,{method:'DELETE'})).status,200);
+assert.equal((await fetch(base+file.url,{headers})).status,404);
+for(const kind of ['story','inspiration','manuscript','question','link','profile']){
+ let created=await post({...record,kind,title:'自动测试 · '+kind,data:kind==='link'?{url:'https://example.com',category:'测试'}:{status:'草稿'}});assert.equal(created.status,201,kind);let row=created.body.record;row=(await post({...row,deleted:true})).body.record;assert.equal((await req('/api/records?id='+row.id,{method:'DELETE'})).status,200);
+}
+assert.equal((await req('/api/records')).body.records.length,before);
+console.log('PASS: authentication, idempotent initialization, 7 archive types, R2 upload/download, MIME validation, URL validation, optimistic concurrency, favorite, trash/restore, attachment cleanup.');

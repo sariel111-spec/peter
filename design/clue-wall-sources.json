@@ -1,0 +1,170 @@
+{
+  "references": [
+    {
+      "post": "https://www.xiaohongshu.com/explore/6a9bdad00000000011036bd4",
+      "author": "Spidey-daysoff",
+      "files": "ref1-*"
+    },
+    {
+      "post": "https://www.xiaohongshu.com/explore/67c735f20000000029010221",
+      "author": "一把名叫西西的伞",
+      "files": "ref2-*"
+    },
+    {
+      "post": "https://www.xiaohongshu.com/explore/698db9b7000000000a02d0c2",
+      "author": "爱喝豆本豆",
+      "files": "ref3-*"
+    }
+  ],
+  "extractions": [
+    {
+      "asset": "web-fluid.jpg",
+      "reference": "ref3-4.webp",
+      "quad": [
+        300,
+        96,
+        371,
+        511,
+        620,
+        490,
+        605,
+        99
+      ]
+    },
+    {
+      "asset": "oscorp-letter.jpg",
+      "reference": "ref2-1.webp",
+      "crop": [
+        1187,
+        650,
+        1427,
+        1013
+      ]
+    },
+    {
+      "asset": "oscorp-gene-chart.jpg",
+      "reference": "ref3-4.webp",
+      "crop": [
+        716,
+        363,
+        925,
+        626
+      ]
+    },
+    {
+      "asset": "spider-micrograph.jpg",
+      "reference": "ref2-1.webp",
+      "crop": [
+        47,
+        818,
+        337,
+        1044
+      ]
+    },
+    {
+      "asset": "spider-eye-scan.jpg",
+      "reference": "ref1-1.webp",
+      "crop": [
+        813,
+        682,
+        1069,
+        850
+      ]
+    },
+    {
+      "asset": "dna-research.jpg",
+      "reference": "ref1-1.webp",
+      "crop": [
+        531,
+        789,
+        790,
+        941
+      ]
+    },
+    {
+      "asset": "physics-notes.jpg",
+      "reference": "ref3-3.webp",
+      "crop": [
+        4,
+        496,
+        528,
+        738
+      ]
+    },
+    {
+      "asset": "field-equations.jpg",
+      "reference": "ref2-1.webp",
+      "crop": [
+        851,
+        635,
+        1035,
+        889
+      ]
+    },
+    {
+      "asset": "suit-study.jpg",
+      "reference": "ref3-2.webp",
+      "crop": [
+        61,
+        659,
+        274,
+        949
+      ]
+    },
+    {
+      "asset": "sequence-report.jpg",
+      "reference": "ref3-3.webp",
+      "crop": [
+        582,
+        712,
+        855,
+        1029
+      ]
+    },
+    {
+      "asset": "andrew-magazine.jpg",
+      "reference": "ref3-3.webp",
+      "crop": [
+        2,
+        770,
+        354,
+        1059
+      ]
+    },
+    {
+      "asset": "hulkbuster-schematic.jpg",
+      "reference": "ref2-1.webp",
+      "crop": [
+        472,
+        658,
+        713,
+        831
+      ]
+    },
+    {
+      "asset": "gene-bands.jpg",
+      "reference": "ref1-1.webp",
+      "crop": [
+        1025,
+        822,
+        1160,
+        961
+      ]
+    },
+    {
+      "asset": "peter-double.jpg",
+      "reference": "ref3-2.webp",
+      "quad": [
+        487,
+        623,
+        510,
+        742,
+        742,
+        714,
+        719,
+        590
+      ]
+    }
+  ],
+  "note": "Only isolated materials without Gwen or non-Andrew Spider-Man portraits are used. The complete reference photos are not deployed. Existing public/wall images are retained as supplied supplemental TASM assets."
+}

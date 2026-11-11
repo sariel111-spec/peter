@@ -1,0 +1,7 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {warmArchive,readArchiveRecords,readArchiveChronology} from '../app/archive-preload.ts';
+test('entry preload is one-use, expires quickly and never caches a failed auth response',async()=>{const originalFetch=globalThis.fetch,originalNow=Date.now,originalWindow=globalThis.window;let now=10000,calls=[],owner='A',fail=false;globalThis.window={};Date.now=()=>now;globalThis.fetch=async(path)=>{calls.push(path);if(fail)return Response.json({error:'sign in required'},{status:401});return Response.json(path==='/api/records'?{records:[{id:owner}],initialized:true}:{doc:{testOwner:owner},revision:2})};try{
+ warmArchive();warmArchive();assert.equal(calls.length,2);assert.equal((await readArchiveRecords()).records[0].id,'A');assert.equal((await readArchiveChronology()).doc.testOwner,'A');owner='B';assert.equal((await readArchiveRecords()).records[0].id,'B');assert.equal(calls.length,3);
+ warmArchive();now+=9000;owner='C';assert.equal((await readArchiveRecords()).records[0].id,'C');assert.equal((await readArchiveChronology()).doc.testOwner,'C');
+ fail=true;warmArchive();await assert.rejects(readArchiveRecords(),/sign in required/);await assert.rejects(readArchiveChronology(),/sign in required/);fail=false;owner='D';assert.equal((await readArchiveRecords()).records[0].id,'D');
+ }finally{globalThis.fetch=originalFetch;Date.now=originalNow;if(originalWindow===undefined)delete globalThis.window;else globalThis.window=originalWindow}});

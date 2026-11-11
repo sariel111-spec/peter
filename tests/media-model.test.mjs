@@ -1,0 +1,8 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {entryImages,allowsCover,zoomScroll} from '../app/media-model.ts';
+const images=[{id:'a',url:'/long.png',name:'长图',type:'image/png'},{id:'b',url:'/wide.jpg',name:'横图',type:'image/jpeg'},{id:'c',url:'/note.pdf',name:'笔记',type:'application/pdf'}];
+const entry=(kind,cover='/legacy-cover.jpg')=>({kind,title:'记录',data:{cover,files:images}});
+test('four reading categories ignore old cover while preserving attachment order and data',()=>{for(const kind of ['story','inspiration','message','question']){const record=entry(kind);const original=JSON.stringify(record);assert.equal(allowsCover(kind),false);assert.deepEqual(entryImages(record),[{url:'/long.png',title:'长图'},{url:'/wide.jpg',title:'横图'}]);assert.equal(JSON.stringify(record),original)}});
+test('artwork and profile keep an optional chosen photo without duplicates',()=>{for(const kind of ['artwork','profile']){assert.equal(allowsCover(kind),true);assert.deepEqual(entryImages(entry(kind,'/wide.jpg')).map(i=>i.url),['/wide.jpg','/long.png']);assert.deepEqual(entryImages(entry(kind)).map(i=>i.url),['/legacy-cover.jpg','/long.png','/wide.jpg'])}});
+test('image sources are unique, empty files are safe',()=>{assert.deepEqual(entryImages({kind:'story',data:{cover:'/old.jpg'}}),[]);assert.equal(entryImages({kind:'story',data:{files:[...images,images[0]]}}).length,2)});
+test('zoom preserves the content under the viewport center and clamps the origin',()=>{assert.deepEqual(zoomScroll(120,800,600,400,1,2),{left:540,top:1800});assert.deepEqual(zoomScroll(0,0,600,400,1,.5),{left:0,top:0})});

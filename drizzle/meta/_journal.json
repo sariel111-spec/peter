@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1793237228743,
+      "tag": "0000_secret_emma_frost",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1793462509978,
+      "tag": "0001_complete_mother_askani",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1793467647595,
+      "tag": "0002_workable_texas_twister",
+      "breakpoints": true
+    }
+  ]
+}

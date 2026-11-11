@@ -18,7 +18,9 @@
     "test:chronology": "node --test tests/chronology-model.test.mjs",
     "test:chronology-api": "node tests/chronology-api-smoke.mjs",
     "test:inspiration": "node --test tests/inspiration-model.test.mjs",
-    "test:portal-api": "node tests/portal-api-smoke.mjs"
+    "test:portal-api": "node tests/portal-api-smoke.mjs",
+    "build:pages": "vite build --config vite.pages.config.ts",
+    "preview:pages": "vite preview --config vite.pages.config.ts --host 127.0.0.1 --port 4180"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",

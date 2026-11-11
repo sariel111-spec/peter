@@ -1,0 +1,75 @@
+/* Smaller transmission albums; full reading keeps the original image dimensions. */
+.reference-collection.collection-message .archive-collection-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:20px}
+.reference-collection.collection-message .message-album{position:relative;display:block;padding:19px 18px 0;border:1px solid #d9cebb;border-top:3px solid #294055;border-left:1px solid #d9cebb;background:linear-gradient(135deg,#fffcf7,#f8f2e7);box-shadow:2px 3px 0 #e4dac8;min-width:0}
+.reference-collection.collection-message .message-album:nth-child(even){border-top-color:#a6444b}
+.reference-collection.collection-message .message-album header>small{font-size:7px;letter-spacing:.8px;gap:8px;align-items:center;margin-bottom:11px;flex-wrap:wrap}
+.reference-collection.collection-message .message-album header>small>b{font-size:9px;letter-spacing:0;overflow-wrap:anywhere}
+.reference-collection.collection-message .message-album h2{font-size:18px;line-height:1.65}
+.reference-collection.collection-message .message-album h2 button{text-align:left}
+.reference-collection.collection-message .message-album .archive-tags{margin:11px 0;gap:5px;max-height:54px;overflow:auto;scrollbar-width:thin}
+.reference-collection.collection-message .message-album .archive-tags button{font-size:8px;padding:4px 6px}
+.reference-collection.collection-message .message-album .message-note{font-size:11px;line-height:1.9;-webkit-line-clamp:2;margin:12px 0 0}
+.reference-collection.collection-message .message-album>.media-sequence{margin:12px 0 15px}
+.reference-collection.collection-message .message-album .image-reader-viewport{height:clamp(150px,22dvh,210px)!important}
+.reference-collection.collection-message .message-album .image-reader-tools{min-height:32px;padding:3px 6px}
+.reference-collection.collection-message .message-album .image-reader-tools>span{font-size:8px;max-width:120px}
+.reference-collection.collection-message .message-album .image-reader-tools>div{gap:1px}
+.reference-collection.collection-message .message-album .image-reader-tools button{min-width:25px;min-height:26px}
+.reference-collection.collection-message .message-album .media-sequence-nav{padding:3px 0 7px;font-size:8px;gap:4px}
+.reference-collection.collection-message .message-album .media-sequence-nav>div{max-width:68%}
+.reference-collection.collection-message .message-album .media-sequence-nav select{max-width:115px;font-size:8px;height:27px;padding:4px}
+.reference-collection.collection-message .message-album .media-sequence-nav button{min-width:26px;min-height:27px}
+.reference-collection.collection-message .message-album .image-reader-bottom{min-height:29px;padding:1px 6px}
+.reference-collection.collection-message .message-album footer{display:block;padding:10px 0 9px;margin:0;border-top:1px dashed #d8cbb6}
+.reference-collection.collection-message .message-album footer>span{display:block;font-size:8px;color:#b09a7a;line-height:1.5}
+.reference-collection.collection-message .message-album footer .archive-card-actions{padding-top:5px;justify-content:flex-start;gap:9px 12px;font-size:9px;min-width:0}
+.reference-collection.collection-message .message-album footer .archive-card-actions>.icon-button{margin-left:auto}
+.reference-collection.collection-message .message-album-empty{min-height:105px;padding:15px 4px;gap:8px;font-size:10px}
+.reference-collection.collection-message .message-album-empty>svg{width:21px;height:21px}
+.reference-collection.collection-message .message-order-hint{font-size:9px;margin:0 0 5px}
+.reference-collection.collection-message .message-order-rail{padding:6px 0 15px;margin-bottom:17px;background-position-y:28px;gap:7px}
+.reference-collection.collection-message .message-order-point{flex-basis:138px}
+.reference-collection.collection-message .message-order-point>button:nth-child(2){min-height:58px;padding:7px 9px}
+.reference-collection.collection-message .message-order-point i{margin-bottom:6px;width:4px;height:4px}
+.reference-collection.collection-message .message-order-point span{font-size:10px}
+.reference-collection.collection-message .message-order-point small{font-size:7px;margin-top:5px}
+.as-list.reference-collection.collection-message .archive-collection-grid{grid-template-columns:1fr}
+.as-list.reference-collection.collection-message .message-album{display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,.95fr);grid-template-areas:'heading media' 'note media' 'footer footer';column-gap:23px;align-items:start}
+.as-list.reference-collection.collection-message .message-album>header{grid-area:heading}
+.as-list.reference-collection.collection-message .message-album>.message-note{grid-area:note;align-self:start;-webkit-line-clamp:4;margin-top:0}
+.as-list.reference-collection.collection-message .message-album>.media-sequence,.as-list.reference-collection.collection-message .message-album>.message-album-empty{grid-area:media;margin-top:0}
+.as-list.reference-collection.collection-message .message-album>footer{grid-area:footer}
+@media(min-width:1700px){.reference-collection.collection-message:not(.as-list) .archive-collection-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:1000px) and (min-width:761px){.reference-collection.collection-message .message-album{padding:16px 13px 0}.reference-collection.collection-message .message-album h2{font-size:17px}.reference-collection.collection-message .message-album .image-reader-tools>span{max-width:60px}.reference-collection.collection-message .message-album .media-sequence-nav select{max-width:85px}.reference-collection.collection-message .message-album footer .archive-card-actions{gap:7px;font-size:8px}.as-list.reference-collection.collection-message .message-album{column-gap:17px;grid-template-columns:minmax(0,1fr) minmax(230px,.95fr)}}
+@media(max-width:760px){.reference-collection.collection-message .archive-collection-grid{grid-template-columns:1fr;gap:18px}.reference-collection.collection-message .message-album,.as-list.reference-collection.collection-message .message-album{display:block;padding:17px 16px 0}.reference-collection.collection-message .message-album h2{font-size:18px}.reference-collection.collection-message .message-album .image-reader-viewport{height:180px!important}.reference-collection.collection-message .message-album footer .archive-card-actions{font-size:10px;gap:10px 13px}.reference-collection.collection-message .message-album .image-reader-tools>span{max-width:110px}.reference-collection.collection-message .message-order-rail{margin-bottom:14px}.as-list.reference-collection.collection-message .message-album>.message-note{margin-top:12px;-webkit-line-clamp:2}.as-list.reference-collection.collection-message .message-album>.media-sequence{margin:12px 0 15px}}
+@media(hover:none) and (pointer:coarse){.reference-collection.collection-message .message-album .image-reader-tools button{min-width:36px;min-height:38px}.reference-collection.collection-message .message-album .image-reader-tools>span{max-width:82px}.reference-collection.collection-message .message-album footer .archive-card-actions button{min-height:36px}}
+/* Increase the displayed canvas without rewriting any saved layout. */
+.wall-entrance .wall-portal:not(.wall-editing):not(.clue-inspecting){padding:36px clamp(9px,1.1vw,22px) 10px;background-image:radial-gradient(ellipse at 30% 8%,#fffaf0b8,transparent 64%),linear-gradient(110deg,#c0b49a30,transparent 46%,#b8ab9145)}
+.wall-entrance .wall-portal:not(.wall-editing):not(.clue-inspecting) .clue-viewport{width:min(100%,calc((100dvh - 49px)*var(--wall-aspect,1.5)));max-width:1840px}
+.wall-entrance .wall-portal:not(.wall-editing):not(.clue-inspecting) .clue-frame{transform:rotate(-.18deg);box-shadow:1px 2px 0 #b69a76,5px 13px 20px #382b2040,0 35px 45px -30px #34261c8c}
+.wall-entrance .wall-portal:not(.wall-editing)>.clue-tools{top:8px;right:12px;gap:6px}
+.wall-entrance .wall-portal:not(.wall-editing)>.clue-tools>button{width:29px;height:29px;box-shadow:0 1px 6px #3728170d}
+@media(max-width:760px){.wall-entrance .wall-portal:not(.wall-editing):not(.clue-inspecting){padding:45px 7px 12px}.wall-entrance .wall-portal:not(.wall-editing):not(.clue-inspecting) .clue-viewport{width:min(100%,calc((100dvh - 63px)*var(--wall-aspect,.56)))}.wall-entrance .wall-portal:not(.wall-editing)>.clue-tools{top:9px;right:10px}.wall-entrance .wall-portal:not(.wall-editing)>.clue-tools>button{width:32px;height:32px}.wall-entrance .wall-portal:not(.wall-editing):not(.clue-inspecting) .clue-frame{box-shadow:2px 4px 0 #9a80634d,3px 10px 16px #382b2038}}
+/* A persistent, compositor-animated veil survives client-side route loading. */
+.archive-entry-overlay{position:fixed;inset:0;z-index:1000;isolation:isolate;outline:0;overflow:hidden;pointer-events:auto}
+.archive-entry-overlay .web-transfer{position:absolute;inset:0;z-index:0}
+.archive-entry-overlay .web-transfer-surface{clip-path:none;will-change:transform;animation:entry-curtain-in .28s cubic-bezier(.6,0,.2,1) both;transform-origin:50% 100%;background:#23374c}
+.archive-entry-overlay .web-transfer-surface>svg{animation:none;transform:none;opacity:.2}
+.archive-entry-overlay .web-transfer-surface>span{width:35px;height:35px;opacity:.7}
+.archive-entry-overlay.entry-waiting .web-transfer-surface,.archive-entry-overlay.entry-failed .web-transfer-surface{animation:none;transform:translate3d(0,0,0)}
+.archive-entry-overlay.entry-reveal{pointer-events:none}
+.archive-entry-overlay.entry-reveal .web-transfer-surface{animation:entry-curtain-out .32s cubic-bezier(.25,.6,.3,1) both;clip-path:none}
+.entry-thread-progress{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:18px;color:#d9c9a8;opacity:0;animation:entry-wait-hint .2s .85s forwards;pointer-events:none}
+.entry-thread-progress>svg{width:28px;height:28px}.entry-thread-progress>i{height:1px;width:70px;background:#b7ad9166;overflow:hidden}.entry-thread-progress>i:after{content:'';display:block;width:30px;height:1px;background:#efe4ca;animation:entry-silk-progress 1.2s ease-in-out infinite}.entry-thread-progress>span{font:7px/1.5 var(--sans);letter-spacing:2.5px}.entry-reveal .entry-thread-progress,.entry-failed .entry-thread-progress{display:none}
+.entry-connection-retry{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;color:#e7dcc5;width:min(390px,calc(100vw - 36px));padding:28px;background:#253a4de6;border:1px solid #a99a7e55}.entry-connection-retry p{font:20px/1.8 var(--serif);margin:0 0 10px}.entry-connection-retry>span{font-size:11px;color:#b8b4a6}.entry-connection-retry>div{display:flex;gap:10px;justify-content:center;margin-top:25px}.entry-connection-retry button{font-size:11px;padding:10px 13px;border:1px solid #a49a8466}.entry-connection-retry button:hover{background:#d9c9a81a}
+@keyframes entry-curtain-in{from{transform:translate3d(0,102%,0)}to{transform:translate3d(0,0,0)}}
+@keyframes entry-curtain-out{from{transform:translate3d(0,0,0)}to{transform:translate3d(0,-102%,0)}}
+@keyframes entry-silk-progress{0%{transform:translateX(-30px)}100%{transform:translateX(75px)}}
+@keyframes entry-wait-hint{to{opacity:1}}
+@media(prefers-reduced-motion:reduce){.archive-entry-overlay .web-transfer-surface{animation:none!important;transform:none!important;clip-path:none!important}.archive-entry-overlay.entry-reveal{visibility:hidden}.entry-thread-progress{animation:none;opacity:1}.entry-thread-progress>i:after{animation:none;transform:none}.wall-entrance .wall-portal:not(.wall-editing):not(.clue-inspecting) .clue-frame{transform:none}}
+.archive-main[data-section=message]>.archive-topline{height:56px}
+.archive-main[data-section=message]>.archive-heading{padding:27px 0 23px}
+.archive-main[data-section=message]>.archive-heading h1{font-size:25px}
+.archive-main[data-section=message]>.collection-toolbar{margin-bottom:18px}
+.archive-main[data-section=message]>.archive-tag-nav{margin-bottom:15px}
+@media(max-width:760px){.archive-main[data-section=message]>.archive-topline{height:42px}.archive-main[data-section=message]>.archive-heading{padding:21px 0 20px}.archive-main[data-section=message]>.archive-heading h1{font-size:23px}.archive-main[data-section=message]>.archive-heading>.primary-button{margin-top:16px}.archive-main[data-section=message]>.archive-tag-nav{margin-bottom:12px}}

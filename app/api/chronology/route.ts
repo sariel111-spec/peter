@@ -1,0 +1,15 @@
+import {bindings,identity,json,unauthorized} from '../shared';
+import {emptyChronology,validateChronology} from '../../chronology-model';
+type LayoutRow={doc:string;revision:number;updated:string};
+export async function GET(){const owner=await identity();if(!owner)return unauthorized();const r=await bindings().DB.prepare('SELECT doc,revision,updated FROM chronologies WHERE owner=?').bind(owner).first<LayoutRow>();const doc=r?validateChronology(JSON.parse(r.doc)):emptyChronology();const {results}=await bindings().DB.prepare('SELECT id,kind FROM records WHERE owner=?').bind(owner).all<{id:string;kind:string}>();const owned=new Map(results.map(r=>[r.id,r.kind]));doc.story=doc.story.filter(p=>owned.get(p.id)==='story').map(p=>({...p,parentId:p.parentId&&owned.get(p.parentId)!=='story'?null:p.parentId}));doc.message=doc.message.filter(id=>owned.get(id)==='message');return json({doc,revision:r?.revision||0,updated:r?.updated||null})}
+export async function PUT(req:Request){const owner=await identity();if(!owner)return unauthorized();if(req.headers.get('sec-fetch-site')==='cross-site')return json({error:'请从本站保存时间目录'},403);let b;try{b=await req.json() as {doc:unknown;revision:number}}catch{return json({error:'无法读取时间目录'},400)}
+ let doc;try{doc=validateChronology(b.doc);if(!Number.isInteger(b.revision)||b.revision<0)throw Error('目录版本不正确')}catch(e){return json({error:(e as Error).message},400)}
+ const {results}=await bindings().DB.prepare('SELECT id,kind FROM records WHERE owner=?').bind(owner).all<{id:string;kind:string}>();const owned=new Map(results.map(r=>[r.id,r.kind]));
+ // Drop stale tombstones after a permanent deletion; retain recycled records.
+ if(doc.story.some(p=>owned.get(p.id)!=='story')||doc.message.some(id=>owned.get(id)!=='message'))return json({error:'目录包含已删除或不属于你的时间点，请重新读取目录'},400);
+ const ids=new Set(doc.story.map(p=>p.id));for(const p of doc.story)if(p.parentId&&!ids.has(p.parentId)){if(owned.get(p.parentId)!=='story')return json({error:'上级时间点不存在或不属于你的故事线'},400)}
+ // A page still running older code does not know about the cast map or the duo sheet; never let its save erase them.
+ const raw=b.doc as Record<string,unknown>;if(!('cast' in raw)||!('duo' in raw)){const kept=await bindings().DB.prepare('SELECT doc FROM chronologies WHERE owner=?').bind(owner).first<{doc:string}>();if(kept){try{const old=validateChronology(JSON.parse(kept.doc));if(!('cast' in raw)&&old.cast)doc.cast=old.cast;if(!('duo' in raw)&&old.duo)doc.duo=old.duo}catch{}}}
+ const now=new Date().toISOString();const r=b.revision===0?await bindings().DB.prepare('INSERT OR IGNORE INTO chronologies(owner,doc,revision,updated) VALUES(?,?,1,?) RETURNING revision').bind(owner,JSON.stringify(doc),now).first():await bindings().DB.prepare('UPDATE chronologies SET doc=?,revision=revision+1,updated=? WHERE owner=? AND revision=? RETURNING revision').bind(JSON.stringify(doc),now,owner,b.revision).first<{revision:number}>();
+ if(!r)return json({error:'时间目录已在其他页面更新，请读取最新目录后再调整。'},409);return json({doc,revision:r.revision,updated:now});
+}

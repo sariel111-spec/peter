@@ -1,0 +1,6 @@
+'use client';
+import {useRef,useState,type PointerEvent as ReactPointerEvent} from 'react';
+export function useGrabScroll(enabled=true){const active=useRef<{id:number;x:number;y:number;left:number;top:number}|null>(null),[grabbing,setGrabbing]=useState(false);
+ const stop=(e:ReactPointerEvent<HTMLElement>)=>{if(active.current?.id!==e.pointerId)return;active.current=null;setGrabbing(false);if(e.currentTarget.hasPointerCapture(e.pointerId))e.currentTarget.releasePointerCapture(e.pointerId)};
+ return {grabbing,handlers:{onPointerDown:(e:ReactPointerEvent<HTMLElement>)=>{if(!enabled||e.pointerType==='touch'||e.button!==0||(e.target as Element).closest('button,a,input,textarea,select,[contenteditable="true"]'))return;e.preventDefault();e.stopPropagation();e.currentTarget.focus({preventScroll:true});active.current={id:e.pointerId,x:e.clientX,y:e.clientY,left:e.currentTarget.scrollLeft,top:e.currentTarget.scrollTop};e.currentTarget.setPointerCapture(e.pointerId);setGrabbing(true)},onPointerMove:(e:ReactPointerEvent<HTMLElement>)=>{const p=active.current;if(!p||p.id!==e.pointerId)return;e.currentTarget.scrollLeft=p.left+p.x-e.clientX;e.currentTarget.scrollTop=p.top+p.y-e.clientY},onPointerUp:stop,onPointerCancel:stop,onLostPointerCapture:()=>{active.current=null;setGrabbing(false)}}};
+}

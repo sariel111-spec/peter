@@ -1,0 +1,19 @@
+'use client';
+import {useEffect,useRef,useState} from 'react';
+import {Hand,MousePointer2,ArrowUpToLine,ExternalLink,Download,FileText,Paperclip} from 'lucide-react';
+import type {Entry} from './archive';
+import {entryImages,type ReadImage} from './media-model';
+import ImageReader from './image-reader';
+import {useGrabScroll} from './use-grab-scroll';
+export default function EntryReader({entry,onImages,onTag}:{entry:Entry;onImages:(images:ReadImage[],index:number)=>void;onTag:(tag:string)=>void}){
+ const [grab,setGrab]=useState(false),[progress,setProgress]=useState(0),scroll=useRef<HTMLDivElement>(null);const {grabbing,handlers}=useGrabScroll(grab),images=entryImages(entry),files=(entry.data.files||[]).filter(f=>!f.type.startsWith('image/'));
+ const measure=()=>{const el=scroll.current;if(el)setProgress(Math.min(100,Math.round((el.scrollTop+el.clientHeight)/Math.max(1,el.scrollHeight)*100)))};
+ useEffect(()=>{const el=scroll.current;if(!el)return;el.scrollTop=0;setGrab(false);const ro=new ResizeObserver(measure);ro.observe(el);if(el.firstElementChild)ro.observe(el.firstElementChild);return()=>ro.disconnect()},[entry.id]);
+ return <div className="entry-reading"><div className="entry-reading-tools"><span>READING ROOM <small>已读 {progress}%</small></span><div>{images.length>1&&<select aria-label="跳转到图片" defaultValue="" onChange={e=>{if(e.target.value)document.getElementById('read-image-'+entry.id+'-'+e.target.value)?.scrollIntoView({block:'start',behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'})}}><option value="">图片目录 · {images.length}</option>{images.map((im,i)=><option value={i} key={im.url}>{i+1} · {im.title}</option>)}</select>}<button type="button" aria-label="抓手阅读正文" aria-pressed={grab} onClick={()=>setGrab(v=>!v)} title={grab?'切换为文字选择':'拖动正文阅读'}>{grab?<Hand size={14}/>:<MousePointer2 size={14}/>}<span>{grab?'抓手':'选择'}</span></button><button type="button" aria-label="正文回到顶部" onClick={()=>{if(scroll.current)scroll.current.scrollTop=0}} title="回到顶部"><ArrowUpToLine size={14}/></button></div></div>
+ <div ref={scroll} className={`entry-reading-scroll ${grab?'grab-enabled':''} ${grabbing?'is-grabbing':''}`} tabIndex={0} role="region" aria-label={`阅读全文 ${entry.title}`} {...handlers} onScroll={measure}>
+ <article className="entry-reading-paper"><div className="eyebrow">{entry.data.category||'OUR PRIVATE ARCHIVE'}</div><h2>{entry.title}</h2><div className="entry-reading-meta"><time>{entry.data.timeLabel||entry.date.replaceAll('-','.')}</time>{entry.data.status&&<span className="status">{entry.data.status}</span>}<span>{entry.content.replace(/\s/g,'').length.toLocaleString()} 字</span>{images.length>0&&<span>{images.length} 张图片</span>}</div><div className="archive-tags">{entry.tags.map(t=><button type="button" key={t} onClick={()=>onTag(t)}>#{t}</button>)}</div><div className="entry-reading-prose">{entry.content||'这一页还没有写下文字。'}</div>
+ {images.length>0&&<div className="entry-reading-images">{images.map((im,i)=><div key={im.url} id={'read-image-'+entry.id+'-'+i}><div className="reading-image-index">IMAGE {String(i+1).padStart(2,'0')} / {String(images.length).padStart(2,'0')}</div><ImageReader src={im.url} title={im.title} onOpen={()=>onImages(images,i)}/></div>)}</div>}
+ {entry.kind==='link'&&entry.data.url&&<a className="primary-button" href={entry.data.url} target="_blank" rel="noopener noreferrer">打开网站<ExternalLink size={16}/></a>}
+ {files.length>0&&<section className="entry-reading-files"><h3><Paperclip size={15}/>附件 · {files.length}</h3>{files.map(f=><a key={f.id} href={`${f.url}?download=1`} className="file-row"><FileText size={17}/><span>{f.name}<small>{(f.size/1024/1024).toFixed(2)} MB</small></span><Download size={15}/></a>)}</section>}
+ <div className="entry-reading-end">END OF THIS LITTLE MOMENT</div></article></div></div>
+}

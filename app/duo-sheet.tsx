@@ -1,13 +1,12 @@
 'use client';
 import {useEffect,useLayoutEffect,useRef,useState} from 'react';
-import {createPortal} from 'react-dom';
-import {ImagePlus,Music2,Heart,ArrowLeftRight,Plus,X,PencilLine,Eye,Download,Shuffle,ArrowUp,ArrowDown,Ruler,RotateCw,ChevronLeft,ChevronRight,GripVertical} from 'lucide-react';
+import {ImagePlus,Music2,Heart,ArrowLeftRight,Plus,X,PencilLine,Download,Shuffle,ArrowUp,ArrowDown,Ruler,RotateCw,ChevronLeft,ChevronRight,GripVertical} from 'lucide-react';
 import {daysTogether,parseHeight,type DuoSide} from './chronology-model';
 import {exportDuoCard} from './duo-export';
 import {useDuo,shrinkPhoto,type DuoHost} from './duo-store';
 import './duo-sheet.css';
 
-type Props=DuoHost&{notify:(s:string)=>void};
+type Props=DuoHost&{notify:(s:string)=>void;solo:boolean;oldCount:number;onToggleOld:()=>void};
 type SideKey='left'|'right';
 
 // A row of small labels you can add to (Enter) and remove from.
@@ -39,10 +38,11 @@ function HeightPair({him,me,a,b,editable,onChange}:{him:string;me:string;a:strin
   <dl><div style={{color:'#a72f3b'}}><dt>{him}</dt><dd>{h1}<small>cm</small></dd></div><div className="duo-height-diff"><dt>相差</dt><dd>{fixed?Math.round(diff):<CountUp value={Math.round(diff)}/>}<small>cm</small></dd></div><div style={{color:'#23374c'}}><dt>{me}</dt><dd>{h2}<small>cm</small></dd></div></dl></div>
  </section>;
 }
-// A stack of question cards: drag the top one aside to send it to the back, tap to turn it over.
-function QaDeck({items}:{items:{q:string;a:string}[]}){
- const [at,setAt]=useState(0),[turned,setTurned]=useState(false),[drag,setDrag]=useState(0),[leaving,setLeaving]=useState(0),hold=useRef<{x:number;moved:boolean}|null>(null),n=items.length,index=((at%n)+n)%n;
- const go=(d:number)=>{if(n<2)return;setLeaving(d);setTimeout(()=>{setAt(v=>v+1);setTurned(false);setDrag(0);setLeaving(0)},230)};
+// A stack of question cards. Drag the top one aside to send it to the back; what you type underneath shows up on the card as you type.
+function QaDeck({items,jump,onEdit,onRemove,onMove}:{items:{q:string;a:string}[];jump:{to:number;n:number};onEdit:(i:number,patch:{q?:string;a?:string})=>void;onRemove:(i:number)=>void;onMove:(i:number,d:number)=>void}){
+ const [at,setAt]=useState(0),[turned,setTurned]=useState(false),[drag,setDrag]=useState(0),[leaving,setLeaving]=useState(0),hold=useRef<{x:number;moved:boolean}|null>(null),n=items.length,index=((at%n)+n)%n,cur=items[index];
+ useEffect(()=>{if(jump.n){setAt(jump.to);setTurned(false)}},[jump.n]);// eslint-disable-line react-hooks/exhaustive-deps
+ const go=(d:number)=>{if(n<2)return;setLeaving(d);setTimeout(()=>{setAt(v=>v+d);setTurned(false);setDrag(0);setLeaving(0)},230)};
  const down=(e:React.PointerEvent)=>{(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);hold.current={x:e.clientX,moved:false}};
  const move=(e:React.PointerEvent)=>{const g=hold.current;if(!g)return;const dx=e.clientX-g.x;if(Math.abs(dx)>6)g.moved=true;if(g.moved)setDrag(dx)};
  const up=()=>{const g=hold.current;hold.current=null;if(!g)return;if(!g.moved){setTurned(v=>!v);return}if(Math.abs(drag)>90)go(drag>0?1:-1);else setDrag(0)};
@@ -50,24 +50,23 @@ function QaDeck({items}:{items:{q:string;a:string}[]}){
  return <div className="duo-deck">
   <div className="duo-deck-stack" style={{'--drag':drag+'px','--lean':drag/18+'deg'} as React.CSSProperties}>
    {[2,1,0].filter(d=>d<n).map(d=>{const x=items[(index+d)%n],topCard=d===0;return <div key={(index+d)%n} className={`duo-deck-card depth-${d} ${topCard&&turned?'turned':''} ${topCard&&leaving?(leaving>0?'out-right':'out-left'):''} ${topCard&&hold.current?.moved?'held':''}`} {...(topCard?{role:'button',tabIndex:0,'aria-label':`第 ${index+1} 题，共 ${n} 题：${x.q}。${turned?'回答：'+x.a:'按回车翻面'}`,onPointerDown:down,onPointerMove:move,onPointerUp:up,onPointerCancel:()=>{hold.current=null;setDrag(0)},onKeyDown:keys,'data-cursor':'drag'}:{'aria-hidden':true})}>
-     <span className="duo-flip-inner"><span className="duo-flip-face duo-flip-q"><em>Q{String((index+d)%n+1).padStart(2,'0')}</em><b>{x.q||'还没写问题'}</b><small><RotateCw size={12}/>点一下翻面{n>1&&' · 左右拖动换下一张'}</small></span><span className="duo-flip-face duo-flip-a"><em>A</em><b>{x.a||'还没写回答'}</b></span></span>
+     <span className="duo-flip-inner"><span className="duo-flip-face duo-flip-q"><em>Q{String((index+d)%n+1).padStart(2,'0')}</em><b>{x.q||'在右边写下问题'}</b><small><RotateCw size={12}/>点一下翻面{n>1&&' · 左右拖动换下一张'}</small></span><span className="duo-flip-face duo-flip-a"><em>A</em><b>{x.a||'还没写回答'}</b></span></span>
     </div>})}
   </div>
-  {n>1&&<div className="duo-deck-nav"><button type="button" onClick={()=>go(-1)} aria-label="上一题"><ChevronLeft size={16}/></button><span>{String(index+1).padStart(2,'0')} / {String(n).padStart(2,'0')}</span><button type="button" onClick={()=>go(1)} aria-label="下一题"><ChevronRight size={16}/></button></div>}
+  <div className="duo-deck-side">
+   <div className="duo-deck-nav"><button type="button" disabled={n<2} onClick={()=>go(-1)} aria-label="上一题"><ChevronLeft size={16}/></button><span>{String(index+1).padStart(2,'0')} / {String(n).padStart(2,'0')}</span><button type="button" disabled={n<2} onClick={()=>go(1)} aria-label="下一题"><ChevronRight size={16}/></button></div>
+   <label><span>问题</span><input className="duo-ink" value={cur.q} maxLength={80} placeholder="想问什么" onFocus={()=>setTurned(false)} onChange={e=>onEdit(index,{q:e.target.value})}/></label>
+   <label><span>回答</span><textarea className="duo-ink" rows={4} value={cur.a} maxLength={600} placeholder="写在卡片背面" onFocus={()=>setTurned(true)} onChange={e=>onEdit(index,{a:e.target.value})}/></label>
+   <div className="duo-deck-tools"><button type="button" disabled={index===0} onClick={()=>{onMove(index,-1);setAt(index-1)}}><ArrowUp size={13}/>往前排</button><button type="button" disabled={index===n-1} onClick={()=>{onMove(index,1);setAt(index+1)}}><ArrowDown size={13}/>往后排</button><button type="button" className="danger" onClick={()=>{onRemove(index);setTurned(false);setAt(Math.max(0,index-1))}}><X size={13}/>删掉这张</button></div>
+  </div>
  </div>;
 }
 
 export default function DuoSheet(p:Props){
  const live=useDuo(p),{duo,ref,state,status,retry}=live;
  const [stageEdit,setStageEdit]=useState(false),[roleEdit,setRoleEdit]=useState(false),[roleDraft,setRoleDraft]=useState('');
- const has=(d=p.doc.duo)=>!!(d&&(d.right.name||d.since||d.left.portrait||d.right.portrait||d.world||d.qa.length||d.roles.length));
- const [mode,setModeState]=useState<'view'|'edit'>(has()?'view':'edit'),chosen=useRef(false),setMode=(m:'view'|'edit')=>{chosen.current=true;setModeState(m)},[flipped,setFlipped]=useState<Set<number>>(new Set()),[exporting,setExporting]=useState(false);
- useEffect(()=>{if(!chosen.current&&p.ready&&has())setModeState('view')},[p.ready]);// eslint-disable-line react-hooks/exhaustive-deps
- const view=mode==='view';
- const [develop,setDevelop]=useState(0),[dossier,setDossier]=useState<{k:SideKey;from:DOMRect}|null>(null),[closing,setClosing]=useState(false),[spot,setSpot]=useState('duo-top');
- useEffect(()=>{if(view)setDevelop(n=>n+1)},[view]);
- // While showing, the setters do nothing: every field is controlled, so the sheet cannot be changed by accident.
- const top:typeof live.top=view?()=>{}:live.top,side:typeof live.side=view?()=>{}:live.side;
+ const [exporting,setExporting]=useState(false),[spot,setSpot]=useState('duo-top'),[turnedOver,setTurnedOver]=useState<SideKey|null>(null),[jump,setJump]=useState({to:0,n:0});
+ const {top,side}=live;
  const grip=useRef<{x:number;y:number;moved:boolean;id:number}|null>(null);
  const printMove=(e:React.PointerEvent<HTMLElement>)=>{const el=e.currentTarget,g=grip.current;
   if(g&&g.id===e.pointerId){const dx=e.clientX-g.x,dy=e.clientY-g.y;if(!g.moved&&Math.hypot(dx,dy)>6){g.moved=true;el.classList.add('dragging')}if(g.moved){el.style.setProperty('--dx',dx+'px');el.style.setProperty('--dy',dy+'px');el.style.setProperty('--dr',Math.max(-14,Math.min(14,dx/14))+'deg')}return}
@@ -75,9 +74,7 @@ export default function DuoSheet(p:Props){
  const printDown=(e:React.PointerEvent<HTMLElement>)=>{if(e.button!==0||e.pointerType==='touch')return;e.currentTarget.setPointerCapture(e.pointerId);grip.current={x:e.clientX,y:e.clientY,moved:false,id:e.pointerId}};
  const printUp=(e:React.PointerEvent<HTMLElement>,k:SideKey)=>{const el=e.currentTarget,g=grip.current;grip.current=null;el.classList.remove('dragging');for(const v of ['--dx','--dy','--dr'])el.style.removeProperty(v);if(g?.moved)el.dataset.dragged='1'};
  const printLeave=(e:React.PointerEvent<HTMLElement>)=>{if(grip.current)return;e.currentTarget.style.removeProperty('--tx');e.currentTarget.style.removeProperty('--ty')};
- const printClick=(e:React.MouseEvent<HTMLElement>,k:SideKey)=>{const el=e.currentTarget;if(el.dataset.dragged){delete el.dataset.dragged;return}if(view)setDossier({k,from:el.getBoundingClientRect()});else pick(k)};
- const closeDossier=()=>{setClosing(true);setTimeout(()=>{setDossier(null);setClosing(false)},260)};
- useEffect(()=>{if(!dossier)return;const esc=(e:KeyboardEvent)=>{if(e.key==='Escape')closeDossier()};window.addEventListener('keydown',esc);return()=>window.removeEventListener('keydown',esc)},[dossier]);
+ const printClick=(e:React.MouseEvent<HTMLElement>,k:SideKey)=>{const el=e.currentTarget;if(el.dataset.dragged){delete el.dataset.dragged;return}if(duo[k].portrait||duo[k].back)setTurnedOver(k);else pick(k)};
  // Light that follows the pointer across a panel, and a button that leans toward it.
  const light=(e:React.PointerEvent<HTMLElement>)=>{const el=(e.target as HTMLElement).closest<HTMLElement>('.duo-spot');if(!el||e.pointerType==='touch')return;const r=el.getBoundingClientRect();el.style.setProperty('--sx',e.clientX-r.left+'px');el.style.setProperty('--sy',e.clientY-r.top+'px')};
  const pull=(e:React.PointerEvent<HTMLElement>)=>{if(e.pointerType==='touch')return;const el=e.currentTarget,r=el.getBoundingClientRect();el.style.setProperty('--mx',(e.clientX-r.left-r.width/2)*.28+'px');el.style.setProperty('--my',(e.clientY-r.top-r.height/2)*.34+'px')};
@@ -86,11 +83,11 @@ export default function DuoSheet(p:Props){
  const parts=[['duo-top','档案'],['duo-height','身高'],['duo-more','关系'],['duo-qa','问答']] as const;
  useEffect(()=>{const seen=new Map<string,number>(),io=new IntersectionObserver(list=>{for(const en of list)seen.set(en.target.id,en.isIntersecting?en.intersectionRatio:0);let best='',top=0;for(const [id,r] of seen)if(r>top){top=r;best=id}if(best)setSpot(best)},{threshold:[0,.2,.5,.8],rootMargin:'-20% 0px -30% 0px'});for(const [id] of parts){const el=document.getElementById(id);if(el)io.observe(el)}return()=>io.disconnect()},[]);// eslint-disable-line react-hooks/exhaustive-deps
  const dock=useRef<HTMLDivElement>(null);
- useLayoutEffect(()=>{const el=dock.current,on=el?.querySelector<HTMLElement>('[aria-current=true]');if(el&&on){el.style.setProperty('--dock-x',on.offsetLeft+'px');el.style.setProperty('--dock-w',on.offsetWidth+'px')}},[spot,mode]);
+ useLayoutEffect(()=>{const el=dock.current,on=el?.querySelector<HTMLElement>('[aria-current=true]');if(el&&on){el.style.setProperty('--dock-x',on.offsetLeft+'px');el.style.setProperty('--dock-w',on.offsetWidth+'px')}},[spot]);
  // Drag along the relationship line; it settles on the nearest stage.
- const track=(e:React.PointerEvent<HTMLElement>)=>{if(view||(e.type==='pointermove'&&!(e.buttons&1)))return;const r=e.currentTarget.getBoundingClientRect(),n=duo.stages.length,i=Math.max(0,Math.min(n-1,Math.round((e.clientX-r.left)/r.width*(n-1))));if(i!==duo.stage)top({stage:i})};
+ const track=(e:React.PointerEvent<HTMLElement>)=>{if(e.type==='pointermove'&&!(e.buttons&1))return;const r=e.currentTarget.getBoundingClientRect(),n=duo.stages.length,i=Math.max(0,Math.min(n-1,Math.round((e.clientX-r.left)/r.width*(n-1))));if(i!==duo.stage)top({stage:i})};
  const savePicture=async()=>{setExporting(true);try{await exportDuoCard(duo);p.notify('设定卡已保存为图片')}catch(e){p.notify((e as Error).message||'图片没有导出成功')}finally{setExporting(false)}};
- const drawQuestion=()=>{const used=new Set(duo.qa.map(x=>x.q)),left=questionBank.filter(q=>!used.has(q));if(duo.qa.length>=80){p.notify('问答最多 80 条');return}const q=left.length?left[Math.floor(Math.random()*left.length)]:'';live.top({qa:[...duo.qa,{q,a:''}]});setMode('edit')};
+ const drawQuestion=()=>{const used=new Set(duo.qa.map(x=>x.q)),left=questionBank.filter(q=>!used.has(q));if(duo.qa.length>=80){p.notify('问答最多 80 条');return}const q=left.length?left[Math.floor(Math.random()*left.length)]:'';top({qa:[...duo.qa,{q,a:''}]});setJump(j=>({to:duo.qa.length,n:j.n+1}))};
  const moveQa=(i:number,d:number)=>{const j=i+d;if(j<0||j>=duo.qa.length)return;const next=[...duo.qa];[next[i],next[j]]=[next[j],next[i]];top({qa:next})};
  const file=useRef<HTMLInputElement>(null),target=useRef<SideKey|'photo'>('left');
  const upload=async(f?:File)=>{if(!f)return;try{if(target.current==='photo')top({photo:await shrinkPhoto(f,800,560,190000)});else side(target.current,{portrait:await shrinkPhoto(f,480,640)})}catch(e){p.notify((e as Error).message)}};
@@ -100,8 +97,13 @@ export default function DuoSheet(p:Props){
 
  const text=(k:SideKey,f:keyof DuoSide,placeholder:string,label:string,max=40)=><input className="duo-ink" value={duo[k][f] as string} maxLength={max} placeholder={placeholder} aria-label={label} onChange={e=>side(k,{[f]:e.target.value} as Partial<DuoSide>)}/>;
  const card=(k:SideKey,tone:string)=>{const d=duo[k],who=k==='left'?him:me;return <section className={`duo-person duo-${k}`} style={{'--tone':tone} as React.CSSProperties} aria-label={`${who}的设定`}>
-  <button type="button" className="duo-portrait" onPointerMove={printMove} onPointerDown={printDown} onPointerUp={e=>printUp(e,k)} onPointerCancel={e=>printUp(e,k)} onPointerLeave={printLeave} onClick={e=>printClick(e,k)} aria-label={view?`打开${who}的档案`:`更换${who}的照片`} data-cursor={view?'view':undefined}>{d.portrait?<img key={develop} className={view?'developing':''} src={d.portrait} alt="" draggable={false}/>:<span><ImagePlus size={22}/>{view?'还没有照片':'放一张照片'}</span>}{d.portrait&&!view&&<em><ImagePlus size={13}/>更换</em>}<b className="duo-glare"/><i/></button>
-  {d.portrait&&<button type="button" className="duo-portrait-clear" onClick={()=>side(k,{portrait:''})} aria-label={`移除${who}的照片`}><X size={13}/></button>}
+  <div className={`duo-print ${turnedOver===k?'over':''}`}>
+   <button type="button" className="duo-portrait" tabIndex={turnedOver===k?-1:0} onPointerMove={printMove} onPointerDown={printDown} onPointerUp={e=>printUp(e,k)} onPointerCancel={e=>printUp(e,k)} onPointerLeave={printLeave} onClick={e=>printClick(e,k)} aria-label={d.portrait?`把${who}的照片翻到背面`:`放一张${who}的照片`}>{d.portrait?<img key={d.portrait.length} className="developing" src={d.portrait} alt="" draggable={false}/>:<span><ImagePlus size={22}/>放一张照片</span>}{d.portrait&&<em><RotateCw size={13}/>翻到背面</em>}<b className="duo-glare"/><i/></button>
+   <div className="duo-print-back" aria-hidden={turnedOver!==k}>
+    <textarea value={d.back} maxLength={240} tabIndex={turnedOver===k?0:-1} placeholder="照片背面，写点只有你知道的…" aria-label={`${who}照片背面的字`} onChange={e=>side(k,{back:e.target.value})}/>
+    <p><button type="button" tabIndex={turnedOver===k?0:-1} onClick={()=>pick(k)}><ImagePlus size={13}/>{d.portrait?'换照片':'放照片'}</button>{d.portrait&&<button type="button" tabIndex={turnedOver===k?0:-1} onClick={()=>side(k,{portrait:''})}><X size={13}/>取下</button>}<button type="button" tabIndex={turnedOver===k?0:-1} onClick={()=>setTurnedOver(null)}><RotateCw size={13}/>翻回去</button></p>
+   </div>
+  </div>
   <input className="duo-ink duo-name" value={d.name} maxLength={60} placeholder={k==='left'?'他的名字':'我的名字'} aria-label="名字" onChange={e=>side(k,{name:e.target.value})}/>
   <dl className="duo-facts">
    <div><dt>年龄</dt><dd>{text(k,'age','—','年龄')}</dd></div><div><dt>身高</dt><dd>{text(k,'height','—','身高')}</dd></div>
@@ -120,10 +122,9 @@ export default function DuoSheet(p:Props){
  </div>};
  const addRole=()=>{const v=roleDraft.trim();if(!v)return;if(!duo.roleOptions.includes(v)&&duo.roleOptions.length<40)top({roleOptions:[...duo.roleOptions,v],roles:[...duo.roles,v]});else if(!duo.roles.includes(v))top({roles:[...duo.roles,v]});setRoleDraft('')};
 
- return <section className={`duo-sheet duo-mode-${mode}`} aria-label="双人设定速览" onPointerMove={light}>
-  <header className="duo-head"><div><small>THE TWO OF US</small><h2>设定速览</h2><p>{view?<><Eye size={13}/>正在展示。想改内容，切到「编辑」。</>:<><PencilLine size={13}/>每一处文字都可以直接点击修改，停下后自动保存。</>}</p></div>
+ return <section className={`duo-sheet duo-mode-edit duo-live ${p.solo?'duo-solo':''}`} aria-label="双人设定速览" onPointerMove={light}>
+  <header className="duo-head"><div><small>THE TWO OF US</small><h2>设定速览</h2><p><PencilLine size={13}/>这一页的每一处都可以直接点着改，改完自动保存。</p></div>
    <div className="duo-head-tools"><span role="status" data-state={state}>{status}{state==='failed'&&<button type="button" onClick={retry}>再试一次</button>}</span>
-    <div className="duo-switch" role="radiogroup" aria-label="展示或编辑" data-mode={mode}><i aria-hidden="true"/><button type="button" role="radio" aria-checked={view} onClick={()=>setMode('view')}><Eye size={14}/>展示</button><button type="button" role="radio" aria-checked={!view} onClick={()=>setMode('edit')}><PencilLine size={14}/>编辑</button></div>
     <button type="button" className="duo-export" disabled={exporting} onClick={savePicture} onPointerMove={pull} onPointerLeave={release}><Download size={14}/>{exporting?'正在生成…':'存为设定卡图片'}</button></div></header>
   <div className="duo-spread" id="duo-top">
    {card('left','#a72f3b')}
@@ -133,7 +134,7 @@ export default function DuoSheet(p:Props){
     <div className="duo-since">{days?<><span>在一起的第</span><strong><CountUp value={days}/></strong><span>天</span></>:<span>写下纪念日，这里会开始数日子</span>}<input className="duo-ink" value={duo.since} maxLength={40} placeholder="纪念日，例如 2012-07-03" aria-label="纪念日" onChange={e=>top({since:e.target.value})}/></div>
     <div className="duo-progress" style={{'--at':duo.stages.length>1?duo.stage/(duo.stages.length-1):0} as React.CSSProperties}>
      <div className="duo-label-row"><span>关系进程</span><button type="button" onClick={()=>setStageEdit(v=>!v)} aria-expanded={stageEdit}>{stageEdit?'完成':'编辑阶段'}</button></div>
-     <div className="duo-track" role="radiogroup" aria-label="关系进程" onPointerDown={e=>{if(!view){e.currentTarget.setPointerCapture(e.pointerId);track(e)}}} onPointerMove={track}><i/><b className="duo-track-heart" aria-hidden="true"><Heart size={11} fill="currentColor"/></b>{duo.stages.map((s,i)=><button type="button" key={i} role="radio" aria-checked={duo.stage===i} className={i<=duo.stage?'passed':''} style={{left:(duo.stages.length>1?i/(duo.stages.length-1)*100:0)+'%'}} onClick={()=>top({stage:i})}><em/><span>{s||'未命名'}</span></button>)}</div>
+     <div className="duo-track" role="radiogroup" aria-label="关系进程" onPointerDown={e=>{e.currentTarget.setPointerCapture(e.pointerId);track(e)}} onPointerMove={track}><i/><b className="duo-track-heart" aria-hidden="true"><Heart size={11} fill="currentColor"/></b>{duo.stages.map((s,i)=><button type="button" key={i} role="radio" aria-checked={duo.stage===i} className={i<=duo.stage?'passed':''} style={{left:(duo.stages.length>1?i/(duo.stages.length-1)*100:0)+'%'}} onClick={()=>top({stage:i})}><em/><span>{s||'未命名'}</span></button>)}</div>
      {stageEdit&&<div className="duo-stage-edit">{duo.stages.map((s,i)=><span key={i}><input value={s} maxLength={12} aria-label={`第 ${i+1} 个阶段`} onChange={e=>top({stages:duo.stages.map((x,j)=>j===i?e.target.value:x)})}/>{duo.stages.length>2&&<button type="button" aria-label={`删除阶段 ${s}`} onClick={()=>top({stages:duo.stages.filter((_,j)=>j!==i),stage:Math.min(duo.stage>i?duo.stage-1:duo.stage,duo.stages.length-2)})}><X size={12}/></button>}</span>)}{duo.stages.length<8&&<button type="button" className="duo-stage-add" onClick={()=>top({stages:[...duo.stages,'']})}><Plus size={13}/>加一个阶段</button>}</div>}
     </div>
     <div className="duo-exchange">{bubble('left','right')}<ArrowLeftRight size={16} aria-hidden="true"/>{bubble('right','left')}</div>
@@ -143,12 +144,12 @@ export default function DuoSheet(p:Props){
    </div>
    {card('right','#23374c')}
   </div>
-  <HeightPair him={him} me={me} a={duo.left.height} b={duo.right.height} editable={!view} onChange={(k,text)=>side(k,{height:text})}/>
+  <HeightPair him={him} me={me} a={duo.left.height} b={duo.right.height} editable onChange={(k,text)=>side(k,{height:text})}/>
   <div className="duo-more" id="duo-more">
    <section className="duo-roles duo-spot" aria-label="关系定位">
     <div className="duo-label-row"><span>关系定位</span><button type="button" onClick={()=>setRoleEdit(v=>!v)} aria-expanded={roleEdit}>{roleEdit?'完成':'增删选项'}</button></div>
     <p className="duo-help">{roleEdit?'点 × 把不需要的选项删掉，或在下面写一个新的。':'点一下选中，再点一下取消。'}</p>
-    <div className="duo-role-list">{(view?duo.roleOptions.filter(r=>duo.roles.includes(r)):duo.roleOptions).map(r=>{const on=duo.roles.includes(r);return roleEdit?<span key={r} className="duo-role editing">{r}<button type="button" aria-label={`删除选项 ${r}`} onClick={()=>top({roleOptions:duo.roleOptions.filter(x=>x!==r),roles:duo.roles.filter(x=>x!==r)})}><X size={11}/></button></span>:<button type="button" key={r} className={`duo-role ${on?'on':''}`} aria-pressed={on} onClick={()=>top({roles:on?duo.roles.filter(x=>x!==r):[...duo.roles,r]})}><i/>{r}</button>})}<input className="duo-role-new" value={roleDraft} maxLength={16} placeholder="＋ 写一个自己的" aria-label="添加关系定位" onChange={e=>setRoleDraft(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'){e.preventDefault();addRole()}}} onBlur={addRole}/></div>
+    <div className="duo-role-list">{duo.roleOptions.map(r=>{const on=duo.roles.includes(r);return roleEdit?<span key={r} className="duo-role editing">{r}<button type="button" aria-label={`删除选项 ${r}`} onClick={()=>top({roleOptions:duo.roleOptions.filter(x=>x!==r),roles:duo.roles.filter(x=>x!==r)})}><X size={11}/></button></span>:<button type="button" key={r} className={`duo-role ${on?'on':''}`} aria-pressed={on} onClick={()=>top({roles:on?duo.roles.filter(x=>x!==r):[...duo.roles,r]})}><i/>{r}</button>})}<input className="duo-role-new" value={roleDraft} maxLength={16} placeholder="＋ 写一个自己的" aria-label="添加关系定位" onChange={e=>setRoleDraft(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'){e.preventDefault();addRole()}}} onBlur={addRole}/></div>
     <label className="duo-world"><span>我们的世界观</span><textarea className="duo-ink" rows={5} value={duo.world} maxLength={600} placeholder="这个宇宙里，故事发生在哪里、从哪一刻开始。" onChange={e=>top({world:e.target.value})}/></label>
    </section>
    <section className="duo-scales duo-spot" aria-label="谁更">
@@ -164,23 +165,12 @@ export default function DuoSheet(p:Props){
    </section>
   </div>
   <section className="duo-qa duo-spot" id="duo-qa" aria-label="问答卡">
-   <div className="duo-label-row"><span>问答卡</span><b className="duo-qa-tools"><button type="button" onClick={drawQuestion}><Shuffle size={13}/>抽一题</button><button type="button" onClick={()=>{live.top({qa:[...duo.qa,{q:'',a:''}]});setMode('edit')}}><Plus size={13}/>自己写一题</button></b></div>
-   <p className="duo-help">{view?'点一下卡片翻面看回答。':'问题和回答都可以改；用箭头调整顺序。'}</p>
+   <div className="duo-label-row"><span>问答卡</span><b className="duo-qa-tools"><button type="button" onClick={drawQuestion}><Shuffle size={13}/>抽一题</button><button type="button" onClick={()=>{top({qa:[...duo.qa,{q:'',a:''}]});setJump(j=>({to:duo.qa.length,n:j.n+1}))}}><Plus size={13}/>自己写一题</button></b></div>
    {duo.qa.length===0?<p className="duo-qa-empty">还没有问答。点「抽一题」，从常见的问题里随机来一个，或者自己写。</p>
-   :view?<QaDeck items={duo.qa}/>:<div className="duo-qa-grid">{duo.qa.map((x,i)=>
-     <div key={i} className="duo-qa-edit"><em>Q{String(i+1).padStart(2,'0')}</em><input className="duo-ink" value={x.q} maxLength={80} placeholder="问题" aria-label={`第 ${i+1} 题的问题`} onChange={e=>top({qa:duo.qa.map((y,j)=>j===i?{...y,q:e.target.value}:y)})}/><textarea className="duo-ink" rows={3} value={x.a} maxLength={600} placeholder="回答" aria-label={`第 ${i+1} 题的回答`} onChange={e=>top({qa:duo.qa.map((y,j)=>j===i?{...y,a:e.target.value}:y)})}/><div><button type="button" disabled={i===0} onClick={()=>moveQa(i,-1)} aria-label="上移"><ArrowUp size={13}/></button><button type="button" disabled={i===duo.qa.length-1} onClick={()=>moveQa(i,1)} aria-label="下移"><ArrowDown size={13}/></button><button type="button" onClick={()=>top({qa:duo.qa.filter((_,j)=>j!==i)})} aria-label={`删除第 ${i+1} 题`}><X size={13}/></button></div></div>)}</div>}
+   :<QaDeck items={duo.qa} jump={jump} onEdit={(i,patch)=>top({qa:duo.qa.map((y,j)=>j===i?{...y,...patch}:y)})} onRemove={i=>top({qa:duo.qa.filter((_,j)=>j!==i)})} onMove={moveQa}/>}
   </section>
   <nav className="duo-dock" aria-label="设定速览导航"><div ref={dock}><i aria-hidden="true"/>{parts.map(([id,label])=><button type="button" key={id} aria-current={spot===id} onClick={()=>document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:id==='duo-top'?'start':'center'})}>{label}</button>)}</div></nav>
-  {dossier&&createPortal((()=>{const d=duo[dossier.k],who=dossier.k==='left'?him:me,other=dossier.k==='left'?me:him,tone=dossier.k==='left'?'#a72f3b':'#23374c',rows=[['年龄',d.age],['身高',d.height],['生日',d.birthday],['类型',d.type],['印象物',d.motif],['动物塑',d.animal],...d.extras.map(f=>[f.k,f.v])].filter(([k,v])=>k.trim()&&v.trim());
-   return <div className={`duo-dossier-shade ${closing?'closing':''}`} onPointerDown={e=>{if(e.target===e.currentTarget)closeDossier()}}><div className="duo-dossier" role="dialog" aria-modal="true" aria-label={`${who}的档案`} style={{'--tone':tone,'--from-x':dossier.from.left+dossier.from.width/2-innerWidth/2+'px','--from-y':dossier.from.top+dossier.from.height/2-innerHeight/2+'px','--from-s':String(dossier.from.width/Math.min(innerWidth*.9,860))} as React.CSSProperties}>
-    <button type="button" className="duo-dossier-close" onClick={closeDossier} aria-label="合上档案" autoFocus><X size={18}/></button>
-    <div className="duo-dossier-photo">{d.portrait?<img src={d.portrait} alt=""/>:<b>{who.slice(0,1)}</b>}</div>
-    <div className="duo-dossier-body"><small>PERSONAL FILE</small><h3>{who}</h3>{d.anchors.length>0&&<p className="duo-dossier-chips">{d.anchors.map((x,i)=><span key={i} style={{'--i':i} as React.CSSProperties}>{x}</span>)}</p>}
-     {rows.length>0&&<dl>{rows.map(([k,v],i)=><div key={i} style={{'--i':i} as React.CSSProperties}><dt>{k}</dt><dd>{v}</dd></div>)}</dl>}
-     {d.likes&&<section><h4>喜欢</h4><p>{d.likes}</p></section>}{d.dislikes&&<section><h4>雷点</h4><p>{d.dislikes}</p></section>}
-     {(d.calls||d.view)&&<blockquote>{d.calls&&<em>{who}叫{other}「{d.calls}」</em>}{d.view&&<span>{d.view}</span>}</blockquote>}
-     {!rows.length&&!d.likes&&!d.dislikes&&!d.calls&&!d.view&&!d.anchors.length&&<p className="duo-dossier-empty">这份档案还是空的。切到「编辑」把 TA 写下来。</p>}
-    </div></div></div>})(),document.body)}
+  {p.oldCount>0&&<p className="duo-old"><button type="button" onClick={p.onToggleOld}>{p.solo?`以前单独建过的 ${p.oldCount} 份设定档案还在，点这里展开`:'收起以前的设定档案'}</button></p>}
   <input ref={file} type="file" accept="image/*" hidden onChange={e=>{upload(e.target.files?.[0]);e.target.value=''}}/>
  </section>;
 }

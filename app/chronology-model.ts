@@ -4,12 +4,12 @@ export type CastPerson={id:string;name:string;role:string;note:string;avatar:str
 export type CastLink={id:string;from:string;to:string;label:string;note:string;tone:string;line:'solid'|'dashed';arrow:'none'|'forward'|'both'};
 export type Cast={people:CastPerson[];links:CastLink[]};
 export type DuoFact={k:string;v:string};
-export type DuoSide={name:string;calls:string;age:string;height:string;birthday:string;type:string;motif:string;animal:string;likes:string;dislikes:string;view:string;portrait:string;anchors:string[];extras:DuoFact[]};
+export type DuoSide={name:string;calls:string;age:string;height:string;birthday:string;type:string;motif:string;animal:string;likes:string;dislikes:string;view:string;portrait:string;back:string;anchors:string[];extras:DuoFact[]};
 export type DuoScale={label:string;value:number};
 export type DuoDay={label:string;date:string};
 export type Duo={left:DuoSide;right:DuoSide;photo:string;tags:string;stages:string[];stage:number;ending:''|'HE'|'BE'|'OE';since:string;song:string;world:string;roles:string[];roleOptions:string[];scales:DuoScale[];motto:string;sub:string;quotes:string[];days:DuoDay[];qa:DuoQA[]};
 export type DuoQA={q:string;a:string};
-export const emptyDuoSide=():DuoSide=>({name:'',calls:'',age:'',height:'',birthday:'',type:'',motif:'',animal:'',likes:'',dislikes:'',view:'',portrait:'',anchors:[],extras:[]});
+export const emptyDuoSide=():DuoSide=>({name:'',calls:'',age:'',height:'',birthday:'',type:'',motif:'',animal:'',likes:'',dislikes:'',view:'',portrait:'',back:'',anchors:[],extras:[]});
 export const defaultRoleOptions=['一见钟情','日久生情','双向暗恋','青梅竹马','欢喜冤家','同班同学','秘密恋人','互相救赎','势均力敌','年上','年下','他先动心','我先动心'];
 export const emptyDuo=():Duo=>({left:{...emptyDuoSide(),name:'彼得·帕克'},right:emptyDuoSide(),photo:'',tags:'',stages:['陌生','相识','暧昧','热恋','相守'],stage:0,ending:'',since:'',song:'',world:'',roles:[],roleOptions:[...defaultRoleOptions],scales:[{label:'谁先心动',value:50},{label:'谁更黏人',value:50},{label:'谁更嘴硬',value:50},{label:'谁先道歉',value:50}],motto:'',sub:'',quotes:[],days:[],qa:[]});
 export type Chronology={version:1;story:Placement[];message:string[];cast?:Cast;duo?:Duo};
@@ -27,7 +27,7 @@ export function validateCast(raw:unknown):Cast{
 }
 const duoPortrait=(v:unknown)=>{if(v===''||v==null)return '';if(typeof v!=='string'||v.length>200000||!/^(data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+|\/api\/assets\/[\w-]+|\/images\/[\w.-]+)$/.test(v))throw Error('设定照片格式不正确');return v};
 const duoList=<T,>(v:unknown,max:number,each:(x:unknown)=>T):T[]=>{if(v===undefined||v===null)return [];if(!Array.isArray(v)||v.length>max)throw Error('设定里的条目太多或格式不正确');return v.map(each)};
-function validateDuoSide(raw:unknown):DuoSide{const d=raw as DuoSide;if(!d||typeof d!=='object')throw Error('双人设定格式不正确');const t=(v:unknown,max:number)=>castText(v??'',max,'设定内容');return {name:t(d.name,60),calls:t(d.calls,60),age:t(d.age,40),height:t(d.height,40),birthday:t(d.birthday,40),type:t(d.type,40),motif:t(d.motif,60),animal:t(d.animal,60),likes:t(d.likes,400),dislikes:t(d.dislikes,400),view:t(d.view,400),portrait:duoPortrait(d.portrait),anchors:duoList(d.anchors,16,x=>t(x,24)),extras:duoList(d.extras,12,x=>{const f=x as DuoFact;if(!f||typeof f!=='object')throw Error('设定条目格式不正确');return {k:t(f.k,16),v:t(f.v,120)}})}}
+function validateDuoSide(raw:unknown):DuoSide{const d=raw as DuoSide;if(!d||typeof d!=='object')throw Error('双人设定格式不正确');const t=(v:unknown,max:number)=>castText(v??'',max,'设定内容');return {name:t(d.name,60),calls:t(d.calls,60),age:t(d.age,40),height:t(d.height,40),birthday:t(d.birthday,40),type:t(d.type,40),motif:t(d.motif,60),animal:t(d.animal,60),likes:t(d.likes,400),dislikes:t(d.dislikes,400),view:t(d.view,400),portrait:duoPortrait(d.portrait),back:t(d.back,240),anchors:duoList(d.anchors,16,x=>t(x,24)),extras:duoList(d.extras,12,x=>{const f=x as DuoFact;if(!f||typeof f!=='object')throw Error('设定条目格式不正确');return {k:t(f.k,16),v:t(f.v,120)}})}}
 export function validateDuo(raw:unknown):Duo{const d=raw as Duo;if(!d||typeof d!=='object'||!Array.isArray(d.stages)||d.stages.length<2||d.stages.length>8)throw Error('双人设定格式不正确');const t=(v:unknown,max:number,what='设定内容')=>castText(v??'',max,what);const stages=d.stages.map(x=>t(x,12,'关系阶段'));
  return {left:validateDuoSide(d.left),right:validateDuoSide(d.right),photo:duoPortrait(d.photo),tags:t(d.tags,300,'标签'),stages,stage:Number.isInteger(d.stage)?Math.max(0,Math.min(stages.length-1,d.stage)):0,ending:d.ending==='HE'||d.ending==='BE'||d.ending==='OE'?d.ending:'',since:t(d.since,40,'纪念日'),song:t(d.song,120,'主题曲'),world:t(d.world,600,'世界观'),
   roles:duoList(d.roles,30,x=>t(x,16,'关系定位')),roleOptions:d.roleOptions===undefined?[...defaultRoleOptions]:duoList(d.roleOptions,40,x=>t(x,16,'关系定位')),

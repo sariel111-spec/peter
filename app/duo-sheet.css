@@ -338,3 +338,43 @@
  .duo-portrait>img.developing,.duo-mode-view .duo-height,.duo-mode-view .duo-more>section,.duo-mode-view .duo-qa,.duo-figure-grip,.duo-dossier,.duo-dossier-shade,.duo-dossier-body *{animation:none!important}
  .duo-deck-card,.duo-dock>div>i,.duo-track-heart,.duo-export,.duo-portrait:not(.dragging){transition:none}
 }
+
+/* ---- One live page: no modes. It reads like a finished sheet and every word is editable in place. ---- */
+.duo-solo~*{display:none!important}
+.duo-old{margin:22px 0 0;text-align:center}.duo-old>button{min-height:40px;padding:0 14px;font-size:12.5px;color:#8a7b65;text-decoration:underline;text-underline-offset:4px}.duo-old>button:hover{color:var(--red)}
+.duo-live .duo-ink{border-bottom-color:transparent}
+.duo-live .duo-ink:hover{border-bottom:1px dotted #bfae84}
+.duo-live .duo-ink:focus{border-bottom:1px solid var(--red)}
+.duo-live .duo-ink::placeholder{color:#c9bc9c}
+.duo-live .duo-bubbles .duo-ink:hover{border-bottom-color:#ffffff73}
+/* a pencil mark appears at the end of the row you are pointing at */
+.duo-live .duo-facts>div{position:relative}
+.duo-live .duo-facts>div:not(.wide):hover:after{content:'✎';position:absolute;right:2px;top:50%;translate:0 -50%;font-size:11px;color:#b3a37e;pointer-events:none}
+.duo-live .duo-height,.duo-live .duo-more>section,.duo-live .duo-qa{animation:duo-wake .62s cubic-bezier(.25,1.25,.4,1) backwards}
+.duo-live .duo-more>section:nth-child(1){animation-delay:.07s}.duo-live .duo-more>section:nth-child(2){animation-delay:.14s}.duo-live .duo-qa{animation-delay:.2s}
+/* The print turns over: the back is paper you can write on. */
+.duo-print{position:relative;width:min(100%,210px);aspect-ratio:3/4;perspective:1000px}
+.duo-print>.duo-portrait{width:100%;height:100%;backface-visibility:hidden;-webkit-backface-visibility:hidden;cursor:pointer}
+.duo-print.over>.duo-portrait{transform:rotateY(180deg);pointer-events:none;transition:transform .6s cubic-bezier(.3,1.25,.4,1)}
+.duo-print:not(.over)>.duo-portrait:not(:hover):not(.dragging){transition:rotate .5s cubic-bezier(.3,1.6,.4,1),translate .5s cubic-bezier(.3,1.6,.4,1),box-shadow .18s,transform .6s cubic-bezier(.3,1.25,.4,1)}
+.duo-print-back{position:absolute;inset:0;display:flex;flex-direction:column;padding:16px 14px 10px;background:#fffdf6 repeating-linear-gradient(#fff0 0 27px,#d9cdb680 27px 28px);background-position:0 16px;border:1px solid #e1d6bd;box-shadow:0 8px 18px #3527182b;transform:rotateY(-180deg);backface-visibility:hidden;-webkit-backface-visibility:hidden;transition:transform .6s cubic-bezier(.3,1.25,.4,1);pointer-events:none;rotate:1.2deg}
+.duo-right .duo-print-back{rotate:-1.2deg}
+.duo-print.over>.duo-print-back{transform:none;pointer-events:auto}
+.duo-print-back>textarea{flex:1;min-height:0;width:100%;padding:0 2px;border:0;outline:0;resize:none;background:transparent;font:16px/28px var(--serif);color:var(--tone);font-style:italic}
+.duo-print-back>textarea::placeholder{color:#c2b596;font-style:normal;font-size:13.5px}
+.duo-print-back>p{display:flex;flex-wrap:wrap;gap:4px;margin:0 -14px -10px;padding:6px 10px;border-top:1px solid #e6dcc6;background:#fffdf6}
+.duo-print-back>p>button{display:flex;align-items:center;gap:4px;min-height:32px;padding:0 7px;font-size:11.5px;color:#8a7b65;border-radius:2px}
+.duo-print-back>p>button:hover{color:var(--red);background:#a72f3b0f}
+.duo-portrait>em{right:14px;bottom:14px}
+/* Deck on the left, the card you are writing on the right. */
+.duo-deck{grid-template-columns:minmax(0,440px) minmax(0,1fr);justify-items:stretch;align-items:start;gap:26px 44px;padding:18px 0 22px}
+.duo-deck-stack{width:100%}
+.duo-deck-side{display:grid;gap:14px;min-width:0}
+.duo-deck-side>label{display:grid;gap:4px}.duo-deck-side>label>span{font:600 11.5px var(--sans);letter-spacing:1px;color:#a39680}
+.duo-deck-side .duo-ink{font:16px/1.7 var(--serif);border-bottom:1px dotted #bfae84}
+.duo-deck-nav{margin-top:0;justify-self:start}.duo-deck-nav>button:disabled{opacity:.35;pointer-events:none}
+.duo-deck-tools{display:flex;flex-wrap:wrap;gap:6px}
+.duo-deck-tools>button{display:flex;align-items:center;gap:5px;min-height:36px;padding:0 11px;font-size:12px;color:#6f6452;border:1px solid #ddd2bd;border-radius:2px;background:#fffdf6}
+.duo-deck-tools>button:hover:not(:disabled){border-color:var(--navy);color:var(--navy)}.duo-deck-tools>button.danger:hover{border-color:var(--red);color:var(--red)}.duo-deck-tools>button:disabled{opacity:.4}
+@media(max-width:760px){.duo-deck{grid-template-columns:1fr;gap:44px}.duo-print{width:min(100%,170px)}.duo-print-back>p>button{min-height:38px}.duo-deck-tools>button{min-height:42px}}
+@media(prefers-reduced-motion:reduce){.duo-print>.duo-portrait,.duo-print-back{transition:none!important}.duo-live .duo-height,.duo-live .duo-more>section,.duo-live .duo-qa{animation:none}}

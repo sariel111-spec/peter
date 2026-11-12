@@ -2,15 +2,14 @@ export type Kind='story'|'inspiration'|'manuscript'|'artwork'|'message'|'questio
 export type Asset={id:string;name:string;type:string;size:number;url:string};
 export type Entry={id:string;kind:Kind;title:string;content:string;tags:string[];date:string;favorite:boolean;deleted:boolean;revision:number;updated:string;data:{cover?:string;files?:Asset[];status?:string;url?:string;category?:string;timeLabel?:string;nodeType?:'era'|'moment';parentId?:string|null;order?:number;[key:string]:unknown}};
 export const sections:{id:Exclude<Kind,'manuscript'>|'overview'|'gallery';label:string;en:string;sub:string}[]=[
-{id:'overview',label:'档案总览',en:'THE PRIVATE UNIVERSE',sub:''},
+{id:'profile',label:'我们的设定',en:'YOU, ME & THIS UNIVERSE',sub:'在这个宇宙里，故事由我们定义。'},
 {id:'story',label:'故事时间线',en:'OUR CHAPTERS',sub:'那些相遇，后来都有了回声。'},
 {id:'inspiration',label:'灵感剪贴簿',en:'THE IDEA BOARD',sub:'接住每一个，关于我们的突发奇想。'},
 {id:'artwork',label:'画稿收藏馆',en:'THE ART ARCHIVE',sub:'把每一组画稿，收进属于我们的相册。'},
 {id:'message',label:'传讯记录簿',en:'LITTLE TRANSMISSIONS',sub:'一张张保存，隔着宇宙的心动。'},
 {id:'question',label:'传讯问题簿',en:'WORDS UNSAID',sub:'下次见面时，有好多话想问你。'},
 {id:'link',label:'传讯网站集',en:'PLACES TO CONNECT',sub:'收藏每一个，通往你的入口。'},
-{id:'gallery',label:'影像收藏室',en:'THE CONTACT SHEET',sub:'从纽约街角，到取景框里的你。'},
-{id:'profile',label:'我们的设定',en:'YOU, ME & THIS UNIVERSE',sub:'在这个宇宙里，故事由我们定义。'}];
+{id:'gallery',label:'影像收藏室',en:'THE CONTACT SHEET',sub:'从纽约街角，到取景框里的你。'}];
 const s=(id:string,kind:Kind,title:string,content:string,date:string,cover:string,tags:string[],data:Entry['data']={}):Entry=>({id,kind,title,content,date,tags:['示例',...tags],favorite:false,deleted:false,revision:1,updated:new Date().toISOString(),data:{cover,...data}});
 export const seedEntries:Entry[]=[
 s('s1','story','第一卷 · 借走一束光','摄影课结束时，你发现那台相机里多了一张自己的背影。\n\n“光线刚好。”彼得解释得有点快，手却还握着相机背带。\n\n【可编辑的大学 AU 示例】相遇从校园暗房开始，你可以自由改写主角、日期与每个细节。','2026-09-01','/images/peter-camera.jpg',['校园 AU','初遇'],{status:'已发生',category:'第一卷'}),

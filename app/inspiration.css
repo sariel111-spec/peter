@@ -1,0 +1,84 @@
+/* 灵感: physical things. A pile of cards you deal from, and notes standing in clear pockets you can pull out. No new functions — only how it moves. */
+
+/* ---------- the deck ---------- */
+.inspiration-draw.idea-deck{grid-template-columns:230px minmax(0,1fr);min-height:270px;overflow:visible}
+.idea-deck .draw-art{overflow:visible;perspective:900px}
+.idea-pile{position:relative;width:118px;height:160px;transform-style:preserve-3d;transform:rotateX(18deg) rotateZ(-7deg);transition:transform .45s cubic-bezier(.3,1.4,.4,1)}
+.idea-pile>span{position:absolute;inset:0;display:grid;place-items:center;border-radius:7px;background:linear-gradient(135deg,#2c4159,#1b2c3f);border:1px solid #c9bb9c59;box-shadow:0 1px 0 #ffffff14 inset,0 2px 5px #0006;translate:calc(var(--n)*-2.5px) calc(var(--n)*-3.5px);transition:translate .4s cubic-bezier(.3,1.5,.4,1),rotate .4s cubic-bezier(.3,1.5,.4,1)}
+.idea-pile>span:after{content:'';position:absolute;inset:7px;border:1px solid #c9bb9c38;border-radius:4px}
+.idea-pile>span>svg{width:74px;height:74px;color:#c9bb9c;opacity:.75}
+/* pointing at the button riffles the pile */
+.idea-deck:has(.draw-shuffle:hover:not(:disabled)) .idea-pile{transform:rotateX(10deg) rotateZ(-3deg)}
+.idea-deck:has(.draw-shuffle:hover:not(:disabled)) .idea-pile>span{translate:calc(var(--n)*-7px) calc(var(--n)*-5px);rotate:calc(var(--n)*-3.5deg)}
+.idea-deck:has(.draw-shuffle:active:not(:disabled)) .idea-pile{transform:rotateX(18deg) rotateZ(-7deg) scale(.96)}
+/* each deal: the top back leaves the pile */
+.idea-deck.has-draw .idea-pile>span:last-child{animation:idea-leave .5s cubic-bezier(.4,0,.2,1) both}
+@keyframes idea-leave{0%{opacity:1}55%{opacity:1;translate:70px -46px;rotate:14deg}100%{opacity:0;translate:150px -30px;rotate:24deg}}
+.idea-deck.is-empty .idea-pile>span{border-style:dashed;background:transparent;box-shadow:none}
+/* …and lands face up as a paper card */
+.idea-deck .draw-writing{display:flex;flex-direction:column;padding:26px 30px 22px}
+.idea-deck .draw-writing>small{font-size:10.5px}.idea-deck .draw-writing>small>span{font-size:12px}
+.idea-deck .draw-result{animation:none;perspective:1100px;margin-top:6px}
+.idea-deck .draw-result:not(.idea-dealt)>*{animation:idea-settle .5s cubic-bezier(.25,1.2,.4,1) backwards}
+@keyframes idea-settle{from{opacity:0;translate:0 10px}}
+.idea-deck .draw-result h2{font-size:23px;line-height:1.6;margin:14px 0 8px}
+.idea-deck .draw-result p{font-size:13.5px;-webkit-line-clamp:3}
+.idea-card{position:relative;max-width:560px;margin-top:12px;transform-style:preserve-3d;animation:idea-deal .78s cubic-bezier(.25,1.05,.35,1) both;transform-origin:0 60%;rotate:-1.2deg;transition:rotate .25s cubic-bezier(.3,1.5,.4,1),translate .25s cubic-bezier(.3,1.5,.4,1)}
+.idea-card:hover{rotate:0deg;translate:0 -3px}
+@keyframes idea-deal{0%{transform:translate(-210px,10px) rotateY(180deg) rotateZ(-10deg) scale(.42);opacity:0}18%{opacity:1}62%{transform:translate(0,-12px) rotateY(0deg) rotateZ(2deg) scale(1.03)}100%{transform:none}}
+.idea-card-face,.idea-card-back{backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:6px}
+.idea-card-face{padding:18px 22px 20px;background:#fbf5e6;color:#23374c;box-shadow:0 16px 30px #0000004d,0 1px 0 #fff inset;background-image:linear-gradient(#fff0 0 calc(100% - 1px),#d9cba640 0);}
+.idea-card-face:before{content:'';position:absolute;left:22px;right:22px;top:0;height:3px;background:#a72f3b;border-radius:0 0 3px 3px}
+.idea-deck .idea-card-face h2{margin:6px 0 6px;color:#23374c;font-size:22px}
+.idea-deck .idea-card-face p{color:#6f6452;font-size:13.5px}
+.idea-card-back{position:absolute;inset:0;display:grid;place-items:center;transform:rotateY(180deg);background:linear-gradient(135deg,#2c4159,#1b2c3f);border:1px solid #c9bb9c59}
+.idea-card-back>svg{width:84px;height:84px;color:#c9bb9c;opacity:.75}
+.idea-deck .draw-actions{margin-top:auto;padding-top:18px;gap:10px 18px;font-size:12.5px}
+.idea-deck .draw-actions>button{min-height:38px}
+.idea-deck .draw-shuffle{padding:6px 14px;transition:background .16s,border-color .16s,translate .16s,scale .12s}
+.idea-deck .draw-shuffle:hover:not(:disabled){translate:0 -2px}.idea-deck .draw-shuffle:active:not(:disabled){translate:0 0;scale:.96}
+.idea-deck .draw-shuffle:hover:not(:disabled)>svg{animation:idea-shake .45s}
+@keyframes idea-shake{30%{rotate:-20deg}70%{rotate:16deg}}
+
+/* ---------- notes in clear pockets ---------- */
+.reference-collection.collection-inspiration .archive-collection-grid{gap:46px 28px;padding:26px 6px 10px;perspective:1600px}
+.reference-collection.collection-inspiration .archive-item.archive-item{position:relative;overflow:visible;border:0;background:transparent;box-shadow:none;rotate:0deg;display:flex;flex-direction:column;padding:0 10px}
+.reference-collection.collection-inspiration .archive-item.archive-item:before{display:none}
+.reference-collection.collection-inspiration .archive-item.archive-item:hover{transform:none;rotate:0deg;box-shadow:none;z-index:2}
+/* the sheet */
+.reference-collection.collection-inspiration .idea-paper{position:relative;z-index:0;flex:1;padding:24px 22px 96px;background:#fffaf0;box-shadow:0 1px 0 #fff inset,0 6px 16px #3527181f;rotate:-1.1deg;transform-origin:50% 100%;transition:translate .42s cubic-bezier(.3,1.45,.4,1),rotate .42s cubic-bezier(.3,1.45,.4,1),box-shadow .3s;animation:idea-drop .7s cubic-bezier(.25,1.25,.4,1) backwards;animation-delay:calc(var(--i)*70ms + 120ms)}
+.reference-collection.collection-inspiration .archive-item:nth-child(3n+2) .idea-paper{background:#eef1ee;rotate:.8deg}
+.reference-collection.collection-inspiration .archive-item:nth-child(3n) .idea-paper{background:#f8ece6;rotate:-.4deg}
+.reference-collection.collection-inspiration .idea-paper:after{content:'';position:absolute;top:0;right:0;border-style:solid;border-width:0 20px 20px 0;border-color:transparent #f4f1ea #0000 transparent;box-shadow:-2px 2px 3px #35271814}
+@keyframes idea-drop{0%{opacity:0;translate:0 -70px;rotate:5deg}60%{opacity:1}}
+/* pull it out */
+.reference-collection.collection-inspiration .archive-item:hover .idea-paper,.reference-collection.collection-inspiration .archive-item:focus-within .idea-paper{translate:0 -26px;rotate:0deg;box-shadow:0 1px 0 #fff inset,0 22px 34px #3527182e}
+/* the pocket: frosted, with a thumb notch and a tab */
+.reference-collection.collection-inspiration .idea-pocket{position:relative;z-index:1;margin:-78px -10px 0;padding:22px 20px 14px;border-radius:4px 4px 12px 12px;background:linear-gradient(180deg,#ffffff8c,#ffffff4d 55%,#f1e9dc80);border:1px solid #ffffffd9;box-shadow:0 1px 0 #fff inset,0 -1px 0 #35271812,0 12px 22px #35271821;backdrop-filter:blur(5px) saturate(1.1);-webkit-backdrop-filter:blur(5px) saturate(1.1);transition:box-shadow .3s;animation:idea-pocket .5s ease-out backwards}
+@keyframes idea-pocket{from{opacity:0;translate:0 12px}}
+.reference-collection.collection-inspiration .idea-pocket>i{position:absolute;left:50%;top:-1px;width:64px;height:17px;margin-left:-32px;border-radius:0 0 40px 40px;background:#f4f1ea;border:1px solid #ffffffd9;border-top:0;box-shadow:0 2px 3px #3527181a inset}
+.reference-collection.collection-inspiration .idea-pocket>b{position:absolute;left:16px;top:-19px;height:19px;padding:0 10px;display:flex;align-items:center;font:600 10.5px var(--sans);letter-spacing:1px;color:#8e2633;background:#ffffffb3;border:1px solid #ffffffd9;border-bottom:0;border-radius:5px 5px 0 0;backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}
+.reference-collection.collection-inspiration .idea-pocket:after{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(115deg,#fff0 30%,#ffffff8c 45%,#fff0 58%);background-size:260% 100%;background-position:120% 0;transition:background-position .9s ease}
+.reference-collection.collection-inspiration .archive-item:hover .idea-pocket:after{background-position:-40% 0}
+.reference-collection.collection-inspiration .archive-item:hover .idea-pocket{box-shadow:0 1px 0 #fff inset,0 -1px 0 #35271812,0 16px 28px #3527182b}
+.reference-collection.collection-inspiration .idea-pocket .archive-card-actions{margin:0;padding:0;border:0}
+.reference-collection.collection-inspiration .idea-paper h2{font-size:21px}
+.reference-collection.collection-inspiration .idea-paper h2>button{text-align:left;transition:color .16s}
+.reference-collection.collection-inspiration .idea-paper>p{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:6;overflow:hidden}
+/* list view keeps the plain rows */
+.reference-collection.collection-inspiration.as-list .idea-paper{rotate:0deg!important;padding-bottom:90px}
+/* the reader grows out of the note that was picked */
+html[data-idea-lift] .detail-modal{animation:idea-lift .52s cubic-bezier(.25,1.12,.35,1) both}
+@keyframes idea-lift{from{translate:var(--lift-x) var(--lift-y);scale:var(--lift-s);rotate:-3deg;opacity:.35}}
+
+@media(max-width:760px){
+ .inspiration-draw.idea-deck{grid-template-columns:96px minmax(0,1fr);min-height:240px}
+ .idea-pile{width:62px;height:86px}.idea-pile>span>svg{width:40px;height:40px}.idea-pile>span:after{inset:4px}
+ .idea-deck .draw-writing{padding:18px 16px}.idea-deck .draw-result h2,.idea-deck .idea-card-face h2{font-size:18px}
+ .idea-card-face{padding:14px 16px 16px}.idea-deck .draw-actions>button{min-height:44px}
+ @keyframes idea-deal{0%{transform:translate(-90px,10px) rotateY(180deg) rotateZ(-10deg) scale(.4);opacity:0}18%{opacity:1}62%{transform:translate(0,-8px) rotateY(0deg) rotateZ(2deg) scale(1.03)}100%{transform:none}}
+ .reference-collection.collection-inspiration .archive-collection-grid{gap:40px;padding:24px 2px 6px}
+ .reference-collection.collection-inspiration .idea-paper{padding:20px 18px 92px}
+}
+@media(hover:none){.reference-collection.collection-inspiration .archive-item:hover .idea-paper{translate:0 0;rotate:-1.1deg}.reference-collection.collection-inspiration .archive-item:active .idea-paper{translate:0 -14px;rotate:0deg}}
+@media(prefers-reduced-motion:reduce){.idea-pile,.idea-pile>span,.idea-card,.reference-collection.collection-inspiration .idea-paper,.reference-collection.collection-inspiration .idea-pocket,.reference-collection.collection-inspiration .idea-pocket:after{animation:none!important;transition:none!important}html[data-idea-lift] .detail-modal{animation:none}.reference-collection.collection-inspiration .idea-paper{rotate:0deg!important}}

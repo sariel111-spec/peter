@@ -11,6 +11,7 @@ import './chronology.css';
 import {clueWallSources,clueWallPhotos} from './wall-defaults';
 import ArchiveOverview from './archive-overview';
 import InspirationDraw from './inspiration-draw';
+import './inspiration.css';
 import ImageReader from './image-reader';
 import EntryReader from './entry-reader';
 import {allowsCover} from './media-model';

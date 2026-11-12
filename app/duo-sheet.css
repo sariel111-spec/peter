@@ -148,3 +148,91 @@
  .duo-portrait>em,.duo-portrait-clear{opacity:1}
 }
 @media(prefers-reduced-motion:reduce){.duo-portrait,.duo-track>i,.duo-song>span>i{transition:none;animation:none}.duo-portrait{rotate:0deg}}
+
+/* ---------- head tools: 展示 / 编辑 switch, export ---------- */
+.duo-head{align-items:flex-end;flex-wrap:wrap}
+.duo-head-tools{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:flex-end}
+.duo-head-tools>span{font-size:11.5px;color:#8b8374;display:flex;gap:8px;align-items:center}
+.duo-head-tools>span[data-state=failed]{color:var(--red)}.duo-head-tools>span button{text-decoration:underline;color:var(--red);min-height:28px}
+.duo-switch{position:relative;display:grid;grid-template-columns:1fr 1fr;padding:3px;background:#e9e0cb;border-radius:50px}
+.duo-switch>i{position:absolute;top:3px;bottom:3px;left:3px;width:calc(50% - 3px);border-radius:50px;background:#fffdf6;box-shadow:0 2px 6px #3527182b;transition:translate .26s cubic-bezier(.3,1.3,.5,1)}
+.duo-switch[data-mode=edit]>i{translate:100% 0}
+.duo-switch>button{position:relative;display:flex;align-items:center;justify-content:center;gap:6px;min-height:34px;padding:0 16px;font-size:12.5px;color:#8a7b65;transition:color .16s}
+.duo-switch>button[aria-checked=true]{color:var(--red)}
+.duo-export{display:flex;align-items:center;gap:7px;min-height:40px;padding:0 15px;font-size:12.5px;color:#fff8ea;background:var(--navy);border-radius:2px;transition:background .14s,translate .14s}
+.duo-export:hover:not(:disabled){background:var(--red);translate:0 -1px}.duo-export:disabled{opacity:.6}
+
+/* ---------- portraits: tilt toward the pointer, with a moving glare ---------- */
+.duo-person{perspective:900px}
+.duo-portrait{--tx:0;--ty:0;transform:rotateY(calc(var(--tx)*16deg)) rotateX(calc(var(--ty)*-16deg));transform-style:preserve-3d;transition:rotate .18s cubic-bezier(.2,.7,.3,1),box-shadow .18s,translate .18s,transform .22s cubic-bezier(.2,.7,.3,1);will-change:transform}
+.duo-portrait:hover{transition:rotate .18s,box-shadow .18s,translate .18s,transform .06s linear}
+.duo-glare{position:absolute;inset:8px 8px 0;pointer-events:none;opacity:0;transition:opacity .2s;background:radial-gradient(circle at calc(50% + var(--tx)*100%) calc(50% + var(--ty)*100%),#ffffff73,#fff0 46%);mix-blend-mode:soft-light}
+.duo-portrait:hover>.duo-glare{opacity:1}
+
+/* ---------- 展示 mode: the same sheet with the form taken away ---------- */
+.duo-mode-view .duo-ink{border-bottom-color:transparent!important;background:none!important;cursor:default;pointer-events:none}
+.duo-mode-view .duo-ink::placeholder{color:transparent}
+.duo-mode-view .duo-add-line,.duo-mode-view .duo-portrait-clear,.duo-mode-view .duo-photo-clear,.duo-mode-view .duo-extra>dd>button,.duo-mode-view .duo-chips>input,.duo-mode-view .duo-chips>span>button,.duo-mode-view .duo-role-new,.duo-mode-view .duo-scale>button,.duo-mode-view .duo-since>input,.duo-mode-view .duo-tags>.duo-ink,.duo-mode-view .duo-label-row>button,.duo-mode-view .duo-stage-edit,.duo-mode-view .duo-help{display:none}
+.duo-mode-view .duo-facts>div:has(.duo-ink:placeholder-shown),.duo-mode-view .duo-bubbles label:has(.duo-ink:placeholder-shown),.duo-mode-view .duo-song:has(input:placeholder-shown),.duo-mode-view .duo-tags:has(.duo-ink:placeholder-shown),.duo-mode-view .duo-world:has(textarea:placeholder-shown),.duo-mode-view .duo-anchor:not(:has(.duo-chips>span)),.duo-mode-view .duo-scale:has(.duo-ink:placeholder-shown),.duo-mode-view .duo-photo:not(.has){display:none}
+.duo-mode-view .duo-tags{grid-template-columns:auto 1fr}.duo-mode-view .duo-tags>p{grid-column:2;margin:0}
+.duo-mode-view .duo-chips>span{padding:3px 11px}
+.duo-mode-view .duo-track>button,.duo-mode-view .duo-ending button,.duo-mode-view .duo-role,.duo-mode-view .duo-slide>input,.duo-mode-view .duo-photo>button{pointer-events:none}
+.duo-mode-view .duo-ending button:not([aria-checked=true]){display:none}
+.duo-mode-view .duo-row:not(:has([aria-checked=true])),.duo-mode-view .duo-middle>.duo-label-row:not(:has([aria-checked=true])){display:none}
+.duo-mode-view .duo-roles:not(:has(.duo-role)) .duo-role-list:after{content:'还没有选关系定位。切到「编辑」来选。';font-size:12.5px;color:#a39680}
+.duo-mode-view .duo-scale{grid-template-columns:minmax(6.5em,9em) minmax(0,1fr) 4.2em}
+.duo-mode-view .duo-portrait{cursor:default}
+.duo-sheet{transition:none}
+.duo-mode-view .duo-spread{box-shadow:0 22px 50px #35271829,0 1px 0 #fff8 inset}
+
+/* ---------- 身高差 ---------- */
+.duo-height{margin-top:22px;padding:22px 26px;background:#fbf8f0;border:1px solid #e2d9c6}
+.duo-label-row>span{display:inline-flex;align-items:center;gap:7px}
+.duo-height-stage{display:grid;grid-template-columns:minmax(0,320px) minmax(0,1fr);gap:20px 40px;align-items:center;margin-top:8px}
+.duo-height-stage>svg{width:100%;display:block}
+.duo-height-stage svg g[style]{fill:currentColor}
+.duo-height-stage svg g[style]>*{transform-origin:50% 250px;animation:duo-grow .7s cubic-bezier(.2,.8,.3,1) backwards}
+.duo-height-stage svg g[style]:nth-of-type(odd)>*{animation-delay:.08s}
+@keyframes duo-grow{from{transform:scaleY(.2);opacity:0}to{transform:none;opacity:1}}
+.duo-ground{stroke:#bfae84;stroke-width:1.5}.duo-guide{stroke:#d9cba6;stroke-width:1;stroke-dasharray:3 5}
+.duo-gap line{stroke:var(--red);stroke-width:1.5}.duo-gap text{font:italic 13px Georgia,serif;fill:var(--red)}
+.duo-height-stage>dl{display:flex;align-items:baseline;justify-content:space-around;gap:16px;margin:0;flex-wrap:wrap}
+.duo-height-stage dt{font:13px var(--serif);color:#8a7b65;max-width:9em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.duo-height-stage dd{margin:4px 0 0;font:400 34px/1 Georgia,var(--serif);font-variant-numeric:tabular-nums}
+.duo-height-stage dd>small{font:12px var(--sans);margin-left:4px;color:#a39680}
+.duo-height-diff{color:var(--red);text-align:center}.duo-height-diff dd{font-size:54px}
+.duo-height-empty{border-style:dashed}.duo-height-empty .duo-help{margin-bottom:0}
+.duo-mode-view .duo-height-empty{display:none}
+
+/* ---------- 问答卡 ---------- */
+.duo-qa{margin-top:22px;padding:24px 26px;background:#fbf8f0;border:1px solid #e2d9c6}
+.duo-qa-tools{display:flex;gap:6px}
+.duo-qa-tools>button{display:inline-flex;align-items:center;gap:6px;min-height:34px;padding:0 12px;font:12.5px var(--sans);letter-spacing:0;color:#6f685b;border:1px solid #d9cdb6;background:#fffdf7;transition:color .12s,border-color .12s,translate .12s}
+.duo-qa-tools>button:hover{color:var(--red);border-color:var(--red);translate:0 -1px}
+.duo-mode-view .duo-qa .duo-help{display:block}
+.duo-qa-empty{margin:4px 0 0;font-size:13px;line-height:1.9;color:#9a8d78}
+.duo-qa-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px}
+.duo-flip{perspective:900px;aspect-ratio:5/3.4;text-align:left;min-width:0}
+.duo-flip-inner{position:relative;display:block;width:100%;height:100%;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.3,1.2,.4,1)}
+.duo-flip.turned .duo-flip-inner{transform:rotateY(180deg)}
+.duo-flip:hover:not(.turned) .duo-flip-inner{transform:rotateY(12deg)}
+.duo-flip-face{position:absolute;inset:0;display:flex;flex-direction:column;gap:8px;padding:16px 18px;backface-visibility:hidden;-webkit-backface-visibility:hidden;border:1px solid #ddd2bd;box-shadow:0 6px 16px #3527181a;overflow:hidden}
+.duo-flip-q{background:#fffdf6}
+.duo-flip-a{background:var(--navy);color:#f6efe0;border-color:#394b5c;transform:rotateY(180deg)}
+.duo-flip:nth-child(odd) .duo-flip-a{background:var(--red);border-color:#8e2633}
+.duo-flip-face>em{font:italic 15px Georgia,serif;color:var(--red)}.duo-flip-a>em{color:#ffffff99}
+.duo-flip-face>b{font:400 16px/1.7 var(--serif);overflow:hidden;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;white-space:pre-line}
+.duo-flip-q>small{margin-top:auto;display:flex;align-items:center;gap:5px;font-size:11px;color:#a39680}
+.duo-qa-edit{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 10px;padding:12px 14px;background:#fffdf6;border:1px solid #ddd2bd}
+.duo-qa-edit>em{font:italic 15px Georgia,serif;color:var(--red);padding-top:6px}
+.duo-qa-edit>input{font:15px var(--serif)}
+.duo-qa-edit>textarea{grid-column:2;font:14px/1.75 var(--serif)}
+.duo-qa-edit>div{grid-column:2;display:flex;justify-content:flex-end;gap:2px}
+.duo-qa-edit>div>button{display:grid;place-items:center;width:30px;height:30px;color:#a39680}.duo-qa-edit>div>button:hover:not(:disabled){color:var(--red)}.duo-qa-edit>div>button:disabled{opacity:.3}
+@media(max-width:760px){.duo-head-tools{width:100%;justify-content:space-between}.duo-head-tools>span{width:100%}.duo-height,.duo-qa{padding:18px 14px}.duo-height-stage{grid-template-columns:1fr}.duo-qa-grid{grid-template-columns:1fr}.duo-flip{aspect-ratio:5/2.6}.duo-mode-view .duo-scale{grid-template-columns:minmax(0,1fr) 3.6em}}
+@media(prefers-reduced-motion:reduce){.duo-portrait{transform:none}.duo-flip-inner,.duo-switch>i{transition:none}.duo-height-stage svg g[style]>*{animation:none}}
+.duo-role-list{margin-top:12px}
+.duo-mode-view .duo-exchange:not(:has(.duo-ink:not(:placeholder-shown))){display:none}
+.duo-mode-view .duo-exchange>svg{align-self:center}
+.duo-mode-view .duo-name::placeholder{color:#b3a37e}
+.duo-mode-view .duo-more>section:not(:has(.duo-role,.duo-scale,.duo-world textarea:not(:placeholder-shown))){display:none}

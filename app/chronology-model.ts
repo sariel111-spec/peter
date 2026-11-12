@@ -7,10 +7,11 @@ export type DuoFact={k:string;v:string};
 export type DuoSide={name:string;calls:string;age:string;height:string;birthday:string;type:string;motif:string;animal:string;likes:string;dislikes:string;view:string;portrait:string;anchors:string[];extras:DuoFact[]};
 export type DuoScale={label:string;value:number};
 export type DuoDay={label:string;date:string};
-export type Duo={left:DuoSide;right:DuoSide;photo:string;tags:string;stages:string[];stage:number;ending:''|'HE'|'BE'|'OE';since:string;song:string;world:string;roles:string[];roleOptions:string[];scales:DuoScale[];motto:string;sub:string;quotes:string[];days:DuoDay[]};
+export type Duo={left:DuoSide;right:DuoSide;photo:string;tags:string;stages:string[];stage:number;ending:''|'HE'|'BE'|'OE';since:string;song:string;world:string;roles:string[];roleOptions:string[];scales:DuoScale[];motto:string;sub:string;quotes:string[];days:DuoDay[];qa:DuoQA[]};
+export type DuoQA={q:string;a:string};
 export const emptyDuoSide=():DuoSide=>({name:'',calls:'',age:'',height:'',birthday:'',type:'',motif:'',animal:'',likes:'',dislikes:'',view:'',portrait:'',anchors:[],extras:[]});
 export const defaultRoleOptions=['一见钟情','日久生情','双向暗恋','青梅竹马','欢喜冤家','同班同学','秘密恋人','互相救赎','势均力敌','年上','年下','他先动心','我先动心'];
-export const emptyDuo=():Duo=>({left:{...emptyDuoSide(),name:'彼得·帕克'},right:emptyDuoSide(),photo:'',tags:'',stages:['陌生','相识','暧昧','热恋','相守'],stage:0,ending:'',since:'',song:'',world:'',roles:[],roleOptions:[...defaultRoleOptions],scales:[{label:'谁先心动',value:50},{label:'谁更黏人',value:50},{label:'谁更嘴硬',value:50},{label:'谁先道歉',value:50}],motto:'',sub:'',quotes:[],days:[]});
+export const emptyDuo=():Duo=>({left:{...emptyDuoSide(),name:'彼得·帕克'},right:emptyDuoSide(),photo:'',tags:'',stages:['陌生','相识','暧昧','热恋','相守'],stage:0,ending:'',since:'',song:'',world:'',roles:[],roleOptions:[...defaultRoleOptions],scales:[{label:'谁先心动',value:50},{label:'谁更黏人',value:50},{label:'谁更嘴硬',value:50},{label:'谁先道歉',value:50}],motto:'',sub:'',quotes:[],days:[],qa:[]});
 export type Chronology={version:1;story:Placement[];message:string[];cast?:Cast;duo?:Duo};
 export const emptyCast=():Cast=>({people:[],links:[]});
 const castText=(v:unknown,max:number,what:string)=>{if(typeof v!=='string'||v.length>max)throw Error(what+'太长或格式不正确');return v};
@@ -31,7 +32,7 @@ export function validateDuo(raw:unknown):Duo{const d=raw as Duo;if(!d||typeof d!
  return {left:validateDuoSide(d.left),right:validateDuoSide(d.right),photo:duoPortrait(d.photo),tags:t(d.tags,300,'标签'),stages,stage:Number.isInteger(d.stage)?Math.max(0,Math.min(stages.length-1,d.stage)):0,ending:d.ending==='HE'||d.ending==='BE'||d.ending==='OE'?d.ending:'',since:t(d.since,40,'纪念日'),song:t(d.song,120,'主题曲'),world:t(d.world,600,'世界观'),
   roles:duoList(d.roles,30,x=>t(x,16,'关系定位')),roleOptions:d.roleOptions===undefined?[...defaultRoleOptions]:duoList(d.roleOptions,40,x=>t(x,16,'关系定位')),
   scales:d.scales===undefined?emptyDuo().scales:duoList(d.scales,14,x=>{const c=x as DuoScale;if(!c||typeof c!=='object')throw Error('设定条目格式不正确');return {label:t(c.label,20),value:Number.isFinite(c.value)?Math.max(0,Math.min(100,Math.round(c.value))):50}}),
-  motto:t(d.motto,60),sub:t(d.sub,120),quotes:duoList(d.quotes,60,x=>t(x,200,'语录')),days:duoList(d.days,30,x=>{const c=x as DuoDay;if(!c||typeof c!=='object')throw Error('设定条目格式不正确');return {label:t(c.label,30),date:t(c.date,40)}})}}
+  motto:t(d.motto,60),sub:t(d.sub,120),quotes:duoList(d.quotes,60,x=>t(x,200,'语录')),days:duoList(d.days,30,x=>{const c=x as DuoDay;if(!c||typeof c!=='object')throw Error('设定条目格式不正确');return {label:t(c.label,30),date:t(c.date,40)}}),qa:duoList(d.qa,80,x=>{const c=x as DuoQA;if(!c||typeof c!=='object')throw Error('设定条目格式不正确');return {q:t(c.q,80,'问题'),a:t(c.a,600,'回答')}})}}
 // "2012-07-03", "2012.7.3" or "2012年7月3日" → a local date; anything else stays plain text.
 export function parseDay(text:string):Date|null{const m=text.trim().match(/^(\d{4})[-./年](\d{1,2})[-./月](\d{1,2})日?$/);if(!m)return null;const d=new Date(+m[1],+m[2]-1,+m[3]);return d.getMonth()===+m[2]-1&&d.getDate()===+m[3]?d:null}
 export function daysTogether(since:string,now=new Date()):number|null{const d=parseDay(since);if(!d)return null;const n=Math.floor((new Date(now.getFullYear(),now.getMonth(),now.getDate()).getTime()-d.getTime())/864e5)+1;return n>0?n:null}
@@ -79,3 +80,6 @@ export function remapChronology(records:Entry[],doc:Chronology,map:Map<string,En
  const oldIds=new Set(records.filter(r=>r.kind==='story').map(r=>r.id));const placements=new Map<string,Placement>(records.filter(r=>r.kind==='story').map((r,i)=>[r.id,{id:r.id,parentId:typeof r.data.parentId==='string'&&oldIds.has(r.data.parentId)?r.data.parentId:null,order:i}]));for(const p of doc.story)if(oldIds.has(p.id))placements.set(p.id,p);
  return validateChronology({version:1,story:[...placements.values()].map(p=>{const record=map.get(p.id);if(!record)throw Error('备份缺少对应的故事记录');return {id:record.id,parentId:p.parentId&&map.get(p.parentId)?.kind==='story'?map.get(p.parentId)!.id:null,order:p.order}}),message:doc.message.map(id=>map.get(id)?.kind==='message'?map.get(id)!.id:null).filter((id):id is string=>!!id),cast:doc.cast,duo:doc.duo});
 }
+
+// "178", "178cm", "1.78m" → centimetres; anything else is not a height we can draw.
+export function parseHeight(text:string):number|null{const m=text.replace(/，|,/g,'.').match(/\d+(?:\.\d+)?/);if(!m)return null;let n=parseFloat(m[0]);if(n>0&&n<3)n*=100;return n>=80&&n<=260?Math.round(n*10)/10:null}

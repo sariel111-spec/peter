@@ -236,3 +236,105 @@
 .duo-mode-view .duo-exchange>svg{align-self:center}
 .duo-mode-view .duo-name::placeholder{color:#b3a37e}
 .duo-mode-view .duo-more>section:not(:has(.duo-role,.duo-scale,.duo-world textarea:not(:placeholder-shown))){display:none}
+
+/* ---- Interaction round: things you can pick up, push, flick and open ---- */
+/* Photos behave like loose prints: lift, drag, and they spring back on release. */
+.duo-portrait{touch-action:pan-y;translate:var(--dx,0) var(--dy,0);cursor:grab}
+.duo-left .duo-portrait{rotate:calc(-1.6deg + var(--dr,0deg))}.duo-right .duo-portrait{rotate:calc(1.4deg + var(--dr,0deg))}
+.duo-portrait:hover{translate:var(--dx,0) calc(var(--dy,0px) - 3px)}
+.duo-left .duo-portrait:hover,.duo-right .duo-portrait:hover{rotate:var(--dr,0deg)}
+.duo-portrait:not(.dragging){transition:rotate .5s cubic-bezier(.3,1.6,.4,1),translate .5s cubic-bezier(.3,1.6,.4,1),box-shadow .18s,transform .22s cubic-bezier(.2,.7,.3,1)}
+.duo-portrait.dragging{transition:box-shadow .18s;cursor:grabbing;z-index:6;box-shadow:0 30px 50px #35271852;scale:1.04}
+.duo-portrait.dragging>i{opacity:0}.duo-portrait>i{transition:opacity .15s}
+.duo-mode-view .duo-portrait{cursor:zoom-in}
+/* Switching to 展示 develops the photos like a print coming up in the tray. */
+.duo-portrait>img.developing{animation:duo-develop 1.5s cubic-bezier(.3,.6,.3,1) backwards}
+.duo-right .duo-portrait>img.developing{animation-delay:.18s}
+@keyframes duo-develop{0%{filter:brightness(2.4) contrast(.2) saturate(0) blur(5px);opacity:.25}55%{filter:brightness(1.25) contrast(.75) saturate(.3) blur(.6px);opacity:1}100%{filter:saturate(.88) contrast(.98)}}
+/* Panels wake in order when the mode flips. */
+.duo-mode-view .duo-height,.duo-mode-view .duo-more>section,.duo-mode-view .duo-qa{animation:duo-wake .62s cubic-bezier(.25,1.25,.4,1) backwards}
+.duo-mode-view .duo-more>section:nth-child(1){animation-delay:.07s}.duo-mode-view .duo-more>section:nth-child(2){animation-delay:.14s}.duo-mode-view .duo-qa{animation-delay:.2s}
+@keyframes duo-wake{from{opacity:0;translate:0 22px;scale:.975}}
+/* A soft light under the pointer. */
+.duo-spot{position:relative;isolation:isolate}
+.duo-spot:before{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:0;transition:opacity .25s;background:radial-gradient(260px circle at var(--sx,50%) var(--sy,50%),#a72f3b14,#a72f3b00 70%)}
+.duo-spot:hover:before{opacity:1}
+/* The save button leans toward the pointer. */
+.duo-export{translate:var(--mx,0) var(--my,0);transition:background .14s,translate .35s cubic-bezier(.3,1.5,.4,1)}
+.duo-export:hover:not(:disabled){translate:var(--mx,0) var(--my,0)}.duo-export:active:not(:disabled){scale:.96}
+/* Relationship line: a heart you can slide; it settles on the nearest stop. */
+.duo-track{touch-action:pan-y}.duo-mode-edit .duo-track{cursor:ew-resize}
+.duo-track-heart{position:absolute;top:11px;left:calc(var(--at)*100%);z-index:2;display:grid;place-items:center;width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50%;background:var(--red);color:#fff8ea;box-shadow:0 3px 10px #a72f3b61;pointer-events:none;transition:left .42s cubic-bezier(.3,1.5,.4,1),scale .16s}
+.duo-track:active .duo-track-heart{scale:1.18}
+.duo-track>button[aria-checked=true]>em{opacity:0}
+/* Height figures with a handle on top. */
+.duo-tip{font:normal 11.5px var(--sans);color:#a39680}
+.duo-figure.can-drag{cursor:ns-resize;touch-action:none}
+.duo-figure-grip{fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;opacity:.45;animation:duo-nudge 1.6s ease-in-out infinite}
+.duo-figure.can-drag:hover .duo-figure-grip{opacity:1}
+@keyframes duo-nudge{50%{translate:0 -4px}}
+.duo-height-stage svg g.duo-figure>.duo-figure-grip{animation:duo-nudge 1.6s ease-in-out infinite}
+/* Question deck: one card on top, two waiting behind it. */
+.duo-deck{display:grid;justify-items:center;gap:18px;padding:14px 0 4px}
+.duo-deck-stack{position:relative;width:min(100%,440px);aspect-ratio:5/3.2;perspective:1100px}
+.duo-deck-card{position:absolute;inset:0;text-align:left;border-radius:3px;transition:translate .38s cubic-bezier(.3,1.4,.4,1),rotate .38s cubic-bezier(.3,1.4,.4,1),scale .38s cubic-bezier(.3,1.4,.4,1),opacity .25s;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.duo-deck-card.depth-0{z-index:3;translate:var(--drag,0) 0;rotate:var(--lean,0deg);cursor:grab}
+.duo-deck-card.depth-0.held{transition:none;cursor:grabbing}
+.duo-deck-card.depth-1{z-index:2;translate:0 14px;scale:.95;rotate:2.2deg}.duo-deck-card.depth-2{z-index:1;translate:0 28px;scale:.9;rotate:-2.6deg}
+.duo-deck-card.depth-1 .duo-flip-face,.duo-deck-card.depth-2 .duo-flip-face{box-shadow:0 3px 8px #35271814}
+.duo-deck-card.depth-1 .duo-flip-face>*,.duo-deck-card.depth-2 .duo-flip-face>*{opacity:.25}
+.duo-deck-card.out-right{translate:130% -10px;rotate:16deg;opacity:0}.duo-deck-card.out-left{translate:-130% -10px;rotate:-16deg;opacity:0}
+.duo-deck-card.turned .duo-flip-inner{transform:rotateY(180deg)}
+.duo-deck-card:focus-visible{outline:2px solid var(--red);outline-offset:4px}
+.duo-deck-card .duo-flip-face{padding:22px 26px;box-shadow:0 14px 30px #35271826}
+.duo-deck-card .duo-flip-face>b{font-size:18px;-webkit-line-clamp:5}
+.duo-deck-card:nth-child(odd) .duo-flip-a{background:var(--navy)}
+.duo-deck-nav{display:flex;align-items:center;gap:16px;margin-top:22px;font:13px Georgia,serif;color:#8a7b65;font-variant-numeric:tabular-nums}
+.duo-deck-nav>button{display:grid;place-items:center;width:40px;height:40px;border-radius:50%;border:1px solid #d9cdb6;background:#fffdf6;color:var(--ink);transition:translate .16s,background .16s,color .16s}
+.duo-deck-nav>button:hover{background:var(--navy);color:#fff8ea}.duo-deck-nav>button:first-child:hover{translate:-3px 0}.duo-deck-nav>button:last-child:hover{translate:3px 0}
+/* Floating section dock with a pill that slides to where you are. */
+.duo-dock{position:sticky;bottom:18px;z-index:20;display:flex;justify-content:center;margin-top:26px;pointer-events:none}
+.duo-dock>div{position:relative;display:flex;gap:2px;padding:4px;border-radius:50px;background:#1b2836e0;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 10px 26px #1b283647;pointer-events:auto}
+.duo-dock>div>i{position:absolute;top:4px;bottom:4px;left:0;width:var(--dock-w,0);translate:var(--dock-x,0) 0;border-radius:50px;background:#fff8ea;transition:translate .36s cubic-bezier(.3,1.4,.4,1),width .36s cubic-bezier(.3,1.4,.4,1)}
+.duo-dock button{position:relative;min-height:36px;padding:0 16px;font-size:12.5px;color:#fff8eab3;border-radius:50px;transition:color .2s,scale .16s}
+.duo-dock button[aria-current=true]{color:var(--navy);font-weight:600}.duo-dock button:hover{scale:1.08}
+/* A print opens into the full file: it grows out of where the photo was. */
+.duo-dossier-shade{position:fixed;inset:0;z-index:90;display:grid;place-items:center;padding:20px;background:#141c26a8;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);animation:duo-fade .26s both}
+.duo-dossier-shade.closing{animation:duo-fade .26s reverse both}
+.duo-dossier{position:relative;display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1fr);width:min(90vw,860px);max-height:min(88vh,640px);background:#fbf8f0;box-shadow:0 40px 90px #0009;overflow:hidden;animation:duo-open .5s cubic-bezier(.25,1.15,.35,1) both}
+.closing>.duo-dossier{animation:duo-open .26s cubic-bezier(.5,0,.8,.4) reverse both}
+@keyframes duo-fade{from{opacity:0}}
+@keyframes duo-open{from{translate:var(--from-x) var(--from-y);scale:var(--from-s);rotate:-3deg;opacity:.4}}
+.duo-dossier-photo{background:color-mix(in srgb,var(--tone) 14%,#e9dfc9);min-height:260px}
+.duo-dossier-photo>img{width:100%;height:100%;object-fit:cover;display:block}
+.duo-dossier-photo>b{display:grid;place-items:center;height:100%;font:400 120px var(--serif);color:color-mix(in srgb,var(--tone) 55%,#fff0)}
+.duo-dossier-body{padding:34px 34px 30px;overflow:auto;border-top:5px solid var(--tone)}
+.duo-dossier-body>small{font:600 10.5px var(--sans);letter-spacing:2px;color:#a39680}
+.duo-dossier-body>h3{margin:6px 0 14px;font:400 34px/1.2 var(--serif);color:var(--tone)}
+.duo-dossier-chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 18px}
+.duo-dossier-chips>span{padding:4px 11px;font-size:12.5px;border:1px solid color-mix(in srgb,var(--tone) 40%,#fff0);color:var(--tone);border-radius:50px}
+.duo-dossier-body>dl{display:grid;grid-template-columns:1fr 1fr;gap:0 22px;margin:0 0 18px}
+.duo-dossier-body>dl>div{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px dashed #d9cdb6;font-size:13.5px}
+.duo-dossier-body dt{color:#8a7b65;flex:none}.duo-dossier-body dd{margin:0;text-align:right;color:var(--ink)}
+.duo-dossier-chips>span,.duo-dossier-body>dl>div,.duo-dossier-body>section,.duo-dossier-body>blockquote{animation:duo-wake .5s cubic-bezier(.25,1.25,.4,1) backwards;animation-delay:calc(.22s + var(--i,4)*.045s)}
+.duo-dossier-body>section{margin-bottom:14px}.duo-dossier-body h4{margin:0 0 4px;font:600 11.5px var(--sans);letter-spacing:1px;color:#a39680}
+.duo-dossier-body>section>p{margin:0;font:15px/1.8 var(--serif);white-space:pre-line}
+.duo-dossier-body>blockquote{margin:18px 0 0;padding:14px 16px;background:color-mix(in srgb,var(--tone) 8%,#fff0);border-left:3px solid var(--tone);display:grid;gap:6px;font:15px/1.8 var(--serif)}
+.duo-dossier-body>blockquote>em{font:normal 12.5px var(--sans);color:var(--tone)}
+.duo-dossier-empty{color:#8a7b65;font-size:13.5px}
+.duo-dossier-close{position:absolute;top:10px;right:10px;z-index:2;display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:#fffdf6;border:1px solid #d9cdb6;color:var(--ink);transition:rotate .25s,background .16s,color .16s}
+.duo-dossier-close:hover{rotate:90deg;background:var(--red);color:#fff8ea}
+@media(max-width:760px){
+ .duo-dock{bottom:calc(74px + env(safe-area-inset-bottom))}.duo-dock button{padding:0 13px;min-height:40px}
+ .duo-dossier-shade{padding:0;place-items:end center}
+ .duo-dossier{grid-template-columns:1fr;width:100%;max-height:92vh;overflow:auto;border-radius:18px 18px 0 0;animation-name:duo-rise}
+ .closing>.duo-dossier{animation-name:duo-rise}
+ .duo-dossier-photo{height:38vh;min-height:0}.duo-dossier-body{padding:24px 20px calc(28px + env(safe-area-inset-bottom));overflow:visible}
+ .duo-dossier-body>dl{grid-template-columns:1fr}
+ .duo-tip{display:none}.duo-deck-card .duo-flip-face{padding:18px}.duo-deck-card .duo-flip-face>b{font-size:16px}
+}
+@keyframes duo-rise{from{translate:0 100%}}
+@media(prefers-reduced-motion:reduce){
+ .duo-portrait>img.developing,.duo-mode-view .duo-height,.duo-mode-view .duo-more>section,.duo-mode-view .duo-qa,.duo-figure-grip,.duo-dossier,.duo-dossier-shade,.duo-dossier-body *{animation:none!important}
+ .duo-deck-card,.duo-dock>div>i,.duo-track-heart,.duo-export,.duo-portrait:not(.dragging){transition:none}
+}

@@ -247,11 +247,7 @@
 .duo-portrait.dragging{transition:box-shadow .18s;cursor:grabbing;z-index:6;box-shadow:0 30px 50px #35271852;scale:1.04}
 .duo-portrait.dragging>i{opacity:0}.duo-portrait>i{transition:opacity .15s}
 .duo-mode-view .duo-portrait{cursor:zoom-in}
-/* Switching to 展示 develops the photos like a print coming up in the tray. */
-.duo-portrait>img.developing{animation:duo-develop 1.5s cubic-bezier(.3,.6,.3,1) backwards}
-.duo-right .duo-portrait>img.developing{animation-delay:.18s}
-@keyframes duo-develop{0%{filter:brightness(2.4) contrast(.2) saturate(0) blur(5px);opacity:.25}55%{filter:brightness(1.25) contrast(.75) saturate(.3) blur(.6px);opacity:1}100%{filter:saturate(.88) contrast(.98)}}
-/* Panels wake in order when the mode flips. */
+.duo-right /* Panels wake in order when the mode flips. */
 .duo-mode-view .duo-height,.duo-mode-view .duo-more>section,.duo-mode-view .duo-qa{animation:duo-wake .62s cubic-bezier(.25,1.25,.4,1) backwards}
 .duo-mode-view .duo-more>section:nth-child(1){animation-delay:.07s}.duo-mode-view .duo-more>section:nth-child(2){animation-delay:.14s}.duo-mode-view .duo-qa{animation-delay:.2s}
 @keyframes duo-wake{from{opacity:0;translate:0 22px;scale:.975}}
@@ -335,7 +331,7 @@
 }
 @keyframes duo-rise{from{translate:0 100%}}
 @media(prefers-reduced-motion:reduce){
- .duo-portrait>img.developing,.duo-mode-view .duo-height,.duo-mode-view .duo-more>section,.duo-mode-view .duo-qa,.duo-figure-grip,.duo-dossier,.duo-dossier-shade,.duo-dossier-body *{animation:none!important}
+ .duo-mode-view .duo-height,.duo-mode-view .duo-more>section,.duo-mode-view .duo-qa,.duo-figure-grip,.duo-dossier,.duo-dossier-shade,.duo-dossier-body *{animation:none!important}
  .duo-deck-card,.duo-dock>div>i,.duo-track-heart,.duo-export,.duo-portrait:not(.dragging){transition:none}
 }
 

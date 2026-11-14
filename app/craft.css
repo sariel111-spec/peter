@@ -1,0 +1,125 @@
+/* Craft: one decision per place. Each block names what it is for. Functions are untouched. */
+@property --mark{syntax:'<angle>';inherits:false;initial-value:0deg}
+
+/* ── 1. Page title: the camera finds focus ─────────────────────────────── */
+.archive-heading{position:relative;isolation:isolate}
+.craft-web{position:absolute;z-index:-1;inset:0 -44px;width:calc(100% + 88px);height:100%;pointer-events:none;-webkit-mask-image:linear-gradient(90deg,#0000,#000 12%,#000 88%,#0000);mask-image:linear-gradient(90deg,#0000,#000 12%,#000 88%,#0000)}
+.archive-heading h1{animation:craft-rack .75s cubic-bezier(.2,.7,.2,1) both}
+@keyframes craft-rack{from{filter:blur(8px);opacity:.35}}
+.archive-heading h1 em{position:relative;display:inline-block;animation:craft-rack-em 1s .08s cubic-bezier(.2,.7,.2,1) both}
+@keyframes craft-rack-em{0%{filter:blur(10px)}55%,100%{filter:blur(0)}}
+.archive-heading h1 em:after{content:'';position:absolute;inset:4px -10px;pointer-events:none;opacity:0;--c:var(--red);
+ background:linear-gradient(var(--c),var(--c)) 0 0/12px 1.5px,linear-gradient(var(--c),var(--c)) 0 0/1.5px 12px,linear-gradient(var(--c),var(--c)) 100% 0/12px 1.5px,linear-gradient(var(--c),var(--c)) 100% 0/1.5px 12px,linear-gradient(var(--c),var(--c)) 0 100%/12px 1.5px,linear-gradient(var(--c),var(--c)) 0 100%/1.5px 12px,linear-gradient(var(--c),var(--c)) 100% 100%/12px 1.5px,linear-gradient(var(--c),var(--c)) 100% 100%/1.5px 12px;background-repeat:no-repeat;
+ animation:craft-frame 1.5s .1s cubic-bezier(.3,1.2,.4,1) both}
+@keyframes craft-frame{0%{opacity:0;scale:1.5 1.9;translate:-60px 0}30%{opacity:1}48%{scale:1;translate:0 0;opacity:1}56%{opacity:.25}64%{opacity:1}82%{opacity:1}100%{opacity:0}}
+.archive-heading .eyebrow>span{animation:craft-rule .6s .1s cubic-bezier(.2,.7,.2,1) both;transform-origin:0 50%}
+@keyframes craft-rule{from{scale:0 1}}
+
+/* ── 2. The main button fills with ink from where you touch it ─────────── */
+.archive-heading>.primary-button{position:relative;overflow:hidden;isolation:isolate;transition:box-shadow .25s,translate .18s,border-color .3s}
+.archive-heading>.primary-button:before{content:'';position:absolute;z-index:-1;left:var(--bx,50%);top:var(--by,50%);width:0;aspect-ratio:1;border-radius:50%;background:var(--navy);translate:-50% -50%;transition:width .5s cubic-bezier(.3,.8,.3,1)}
+.archive-heading>.primary-button:hover{background:var(--red);border-color:var(--navy);box-shadow:4px 4px 0 #d6c3a6}
+.archive-heading>.primary-button:hover:before{width:260%}
+.archive-heading>.primary-button>svg{transition:rotate .45s cubic-bezier(.3,1.6,.4,1)}
+.archive-heading>.primary-button:hover>svg{rotate:90deg}
+.archive-heading>.primary-button:active{translate:2px 2px;box-shadow:1px 1px 0 #d6c3a6}
+
+/* ── 3. Selections glide: one marker moves, nothing blinks ─────────────── */
+/* sidebar */
+.sidebar nav{position:relative}
+.sidebar nav[data-lens]:before{content:'';position:absolute;left:0;right:0;top:0;height:var(--lens-h);translate:0 var(--lens-y);background:var(--navy);box-shadow:-4px 0 0 -1px var(--red);transition:translate .42s cubic-bezier(.3,1.35,.4,1),height .3s;pointer-events:none}
+.sidebar nav[data-lens] .nav-item{position:relative;z-index:1}
+.sidebar nav[data-lens] .nav-item.active{background:transparent;transition:color .25s .08s}
+.sidebar nav[data-lens] .nav-item>svg{transition:rotate .4s cubic-bezier(.3,1.6,.4,1),scale .4s cubic-bezier(.3,1.6,.4,1)}
+.sidebar nav[data-lens] .nav-item:hover>svg{rotate:-8deg;scale:1.12}
+/* tabs: the underline travels, and a pane of glass sits behind the chosen word */
+.collection-tabs{position:relative}
+.collection-tabs[data-lens]>button.active:after{display:none}
+.collection-tabs[data-lens]:after{content:'';position:absolute;left:0;bottom:-1px;height:2px;width:var(--lens-w);translate:var(--lens-x) 0;background:var(--red);transition:translate .45s cubic-bezier(.3,1.35,.4,1),width .35s cubic-bezier(.3,1.2,.4,1);pointer-events:none}
+.collection-tabs[data-lens]:before{content:'';position:absolute;left:-10px;top:8px;bottom:8px;width:calc(var(--lens-w) + 20px);translate:var(--lens-x) 0;border-radius:3px;background:linear-gradient(180deg,#ffffffa6,#ffffff40);box-shadow:0 1px 0 #fff inset,0 -1px 0 #3527180f inset,0 3px 10px #35271812;transition:translate .45s cubic-bezier(.3,1.35,.4,1),width .35s cubic-bezier(.3,1.2,.4,1);pointer-events:none}
+.collection-tabs>button{z-index:1;transition:color .25s}
+.collection-tabs>button>span{transition:background .25s,color .25s}
+.collection-tabs>button.active>span{background:var(--red);color:#fff6e0}
+/* grid / list switch */
+.view-switch{position:relative}
+.view-switch[data-lens]>button.active{background:transparent}
+.view-switch[data-lens]:before{content:'';position:absolute;left:0;top:0;width:var(--lens-w);height:var(--lens-h);translate:var(--lens-x) var(--lens-y);background:#eae5d9;box-shadow:0 1px 0 #fff inset,0 2px 5px #3527181a;transition:translate .38s cubic-bezier(.3,1.45,.4,1);pointer-events:none}
+.view-switch>button{position:relative;z-index:1;transition:color .2s}
+.view-switch>button>svg{transition:scale .3s cubic-bezier(.3,1.7,.4,1)}.view-switch>button.active>svg{scale:1.12}
+/* tag chips */
+.archive-tag-nav{position:relative}
+.archive-tag-nav[data-lens]:before{content:'';position:absolute;left:0;top:0;width:var(--lens-w);height:var(--lens-h);translate:var(--lens-x) var(--lens-y);background:var(--navy);transition:translate .42s cubic-bezier(.3,1.35,.4,1),width .32s cubic-bezier(.3,1.2,.4,1);pointer-events:none}
+.archive-tag-nav[data-lens]>button{position:relative;z-index:1;transition:color .22s,border-color .22s,translate .16s}
+.archive-tag-nav[data-lens]>button.active{background:transparent}
+.archive-tag-nav>button:not(.active):hover{border-color:var(--navy);color:var(--ink);translate:0 -1px}
+
+/* ── 4. Hearts ─────────────────────────────────────────────────────────── */
+button[aria-label*="收藏"]>svg{transition:scale .2s cubic-bezier(.3,1.8,.4,1),color .2s}
+button[aria-label*="收藏"]:hover>svg{scale:1.18;color:var(--red)}
+button[aria-label*="收藏"]>svg[fill="currentColor"]{color:var(--red);animation:craft-heart .5s cubic-bezier(.3,1.8,.4,1)}
+@keyframes craft-heart{0%{scale:.4}55%{scale:1.45}100%{scale:1}}
+
+/* ── 5. 画稿: a lamp on the gallery wall ───────────────────────────────── */
+.collection-artwork[data-lit]{background:radial-gradient(560px circle at var(--lx) var(--ly),#4d6885 0,#2a4159 38%,#1a2a3b 78%,#142130 100%)}
+.collection-artwork .artwork-album{box-shadow:calc(var(--sx,0)*26px) calc(var(--sy,0)*26px + 16px) 34px #000000a6,0 0 0 1px #0006;transition:box-shadow .25s ease-out}
+.collection-artwork .artwork-album:after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(calc(115deg + var(--sx,0)*40deg),#fff0 38%,#ffffff24 50%,#fff0 62%);opacity:0;transition:opacity .3s;mix-blend-mode:screen}
+.collection-artwork .artwork-album:hover:after{opacity:1}
+.collection-artwork .archive-collection-grid>.archive-item{animation:craft-hang .8s cubic-bezier(.3,1.5,.4,1) backwards;transform-origin:50% -40px}
+.collection-artwork .archive-collection-grid>.archive-item:nth-child(2n){animation-delay:.1s}.collection-artwork .archive-collection-grid>.archive-item:nth-child(3n){animation-delay:.18s}
+@keyframes craft-hang{0%{opacity:0;rotate:-5deg;translate:0 -26px}40%{opacity:1}70%{rotate:1.6deg}}
+
+/* ── 6. 传讯记录: the letter is fed out of a slot, line by line ─────────── */
+.reference-collection.collection-message .archive-collection-grid>.message-album{animation:craft-feed .95s steps(16,end) backwards}
+.reference-collection.collection-message .archive-collection-grid>.message-album:nth-child(2){animation-delay:.14s}.reference-collection.collection-message .archive-collection-grid>.message-album:nth-child(n+3){animation-delay:.26s}
+@keyframes craft-feed{from{clip-path:inset(0 0 100% 0);translate:0 -14px}to{clip-path:inset(0 0 -40px 0);translate:0 0}}
+.reference-collection.collection-message .message-album header>small{position:relative}
+.message-order-point>button>i{transition:scale .3s cubic-bezier(.3,1.8,.4,1),box-shadow .3s}
+.message-order-point:hover>button>i{scale:1.5;box-shadow:0 0 0 4px #a72f3b26}
+.message-order-grip{transition:translate .2s cubic-bezier(.3,1.6,.4,1),color .2s}.message-order-grip:hover{translate:0 -2px;color:var(--red)}
+
+/* ── 7. 问题簿: folded notes open; a stamp comes down when it has been asked ─ */
+.collection-question .archive-collection-grid{perspective:1400px}
+.collection-question .archive-collection-grid>.archive-item{transform-origin:50% 0;animation:craft-unfold .75s cubic-bezier(.3,1.35,.4,1) backwards}
+.collection-question .archive-collection-grid>.archive-item:nth-child(2){animation-delay:.08s}.collection-question .archive-collection-grid>.archive-item:nth-child(3){animation-delay:.16s}.collection-question .archive-collection-grid>.archive-item:nth-child(n+4){animation-delay:.24s}
+@keyframes craft-unfold{0%{opacity:0;transform:rotateX(-86deg)}35%{opacity:1}100%{transform:none}}
+.collection-question .archive-item:after{translate:calc(var(--qx,0)*-16px) calc(var(--qy,0)*-12px);rotate:calc(var(--qx,0)*-10deg);transition:translate .25s ease-out,rotate .25s ease-out,color .3s}
+.collection-question .archive-item:hover:after{color:#a72f3b1c}
+.question-state-toggle{transition:color .2s,border-color .2s,rotate .25s cubic-bezier(.3,1.8,.4,1),scale .2s}
+.question-state-toggle:hover{scale:1.06}
+.question-state-toggle[aria-label="标为待问"]{color:var(--red);padding:2px 8px;border:1.5px solid var(--red);border-radius:3px;rotate:-5deg;animation:craft-stamp .42s cubic-bezier(.3,1.7,.4,1)}
+@keyframes craft-stamp{0%{scale:2.4;opacity:0;rotate:8deg}60%{opacity:1}}
+
+/* ── 8. 网站集: tickets with a stub that pulls ─────────────────────────── */
+.collection-link .archive-link-open{position:relative;transition:translate .32s cubic-bezier(.3,1.5,.4,1),color .2s}
+.collection-link .archive-link-open:before{content:'';position:absolute;left:-28px;right:-28px;top:-1px;border-top:1.5px dashed #c9bda6}
+.collection-link .archive-item:hover .archive-link-open{translate:8px 0;color:var(--red)}
+.collection-link .archive-link-open>svg{transition:translate .32s cubic-bezier(.3,1.6,.4,1)}
+.collection-link .archive-item:hover .archive-link-open>svg{translate:4px -4px}
+.collection-link .archive-link-open:active{translate:12px 0}
+.collection-link .archive-collection-grid>.archive-item{animation:craft-ticket .6s cubic-bezier(.3,1.3,.4,1) backwards}
+.collection-link .archive-collection-grid>.archive-item:nth-child(2n){animation-delay:.09s}.collection-link .archive-collection-grid>.archive-item:nth-child(3n){animation-delay:.16s}
+@keyframes craft-ticket{from{opacity:0;translate:-40px 0;rotate:-3deg}}
+.collection-link .archive-item:after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(105deg,#fff0 35%,#ffffffb3 50%,#fff0 65%);background-size:250% 100%;background-position:130% 0;transition:background-position .8s ease}
+.collection-link .archive-item:hover:after{background-position:-40% 0}
+
+/* ── 9. 影像: the frame you point at gets circled in grease pencil ─────── */
+.archive-main[data-section=gallery] .photo-gallery:not(.gallery-list) .gallery-photo:after{content:'';position:absolute;z-index:3;left:1px;top:0;width:54px;height:36px;border:2.5px solid #ef4b57;border-radius:52% 48% 55% 45%/48% 56% 44% 52%;rotate:-9deg;pointer-events:none;filter:drop-shadow(0 0 1px #0008);-webkit-mask:conic-gradient(from 200deg,#000 var(--mark),#0000 0);mask:conic-gradient(from 200deg,#000 var(--mark),#0000 0);transition:--mark .2s ease-in}
+.archive-main[data-section=gallery] .photo-gallery:not(.gallery-list) .gallery-photo:hover:after,.archive-main[data-section=gallery] .photo-gallery:not(.gallery-list) .gallery-photo:focus-visible:after{--mark:372deg;transition:--mark .55s cubic-bezier(.4,0,.2,1)}
+.archive-main[data-section=gallery] .photo-gallery:not(.gallery-list) .gallery-photo:hover{border-color:#3a3a40;box-shadow:0 10px 26px #000a}
+.archive-main[data-section=gallery] .photo-gallery:not(.gallery-list) .gallery-photo:active img{filter:brightness(1.7);transition:none}
+.archive-main[data-section=gallery] .photo-gallery:not(.gallery-list) .gallery-photo p>svg{transition:translate .3s cubic-bezier(.3,1.6,.4,1)}
+.archive-main[data-section=gallery] .photo-gallery:not(.gallery-list) .gallery-photo:hover p>svg{translate:3px -3px}
+
+/* ── 10. Card actions everywhere: a line is drawn under what you are about to do ─ */
+.archive-card-actions button{position:relative}
+.archive-card-actions button:not(.icon-button):after{content:'';position:absolute;left:0;right:0;bottom:1px;height:1px;background:currentColor;scale:0 1;transform-origin:0 50%;transition:scale .28s cubic-bezier(.3,1.2,.4,1)}
+.archive-card-actions button:not(.icon-button):hover:after{scale:1 1}
+.search-field{transition:box-shadow .25s,background .25s}
+.search-field:focus-within{box-shadow:0 1px 0 var(--red)}
+.search-field>svg{transition:rotate .4s cubic-bezier(.3,1.6,.4,1),color .2s}.search-field:focus-within>svg{rotate:-14deg;color:var(--red)}
+
+@media(max-width:760px){.craft-web{inset:0 -18px;width:calc(100% + 36px)}.collection-tabs[data-lens]:before{left:-6px;width:calc(var(--lens-w) + 12px)}}
+@media(prefers-reduced-motion:reduce){
+ .archive-heading h1,.archive-heading h1 em,.archive-heading h1 em:after,.archive-heading .eyebrow>span,.collection-artwork .archive-collection-grid>.archive-item,.reference-collection.collection-message .archive-collection-grid>.message-album,.collection-question .archive-collection-grid>.archive-item,.collection-link .archive-collection-grid>.archive-item,.question-state-toggle,button[aria-label*="收藏"]>svg{animation:none!important}
+ .sidebar nav[data-lens]:before,.collection-tabs[data-lens]:before,.collection-tabs[data-lens]:after,.view-switch[data-lens]:before,.archive-tag-nav[data-lens]:before,.archive-heading>.primary-button:before{transition:none}
+}
